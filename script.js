@@ -581,9 +581,20 @@ function startMudWashGame() {
     const canvas = document.getElementById('mud-canvas');
     const ctx = canvas.getContext('2d');
 
-    // Set canvas size
-    canvas.width = 400;
-    canvas.height = 300;
+    // Set canvas size - responsive to screen size
+    const isMobile = window.innerWidth <= 768;
+    const isSmallMobile = window.innerWidth <= 480;
+
+    if (isSmallMobile) {
+        canvas.width = Math.min(300, window.innerWidth * 0.85);
+        canvas.height = 200;
+    } else if (isMobile) {
+        canvas.width = Math.min(350, window.innerWidth * 0.9);
+        canvas.height = 250;
+    } else {
+        canvas.width = 400;
+        canvas.height = 300;
+    }
 
     // Fill with mud
     ctx.fillStyle = '#654321';
@@ -604,7 +615,8 @@ function startMudWashGame() {
         pixelsCleared += Math.PI * 30 * 30;
 
         const percentCleared = (pixelsCleared / totalPixels) * 100;
-        if (percentCleared >= 80 && !gameEnding) {
+        // Increased threshold from 80% to 95% for more cleaning required
+        if (percentCleared >= 95 && !gameEnding) {
             gameEnding = true; // Mark as ending to prevent multiple calls
             setTimeout(() => {
                 endIntermission();

@@ -42,15 +42,16 @@ test.describe('Intermission Mini-Games', () => {
     // Simulate drawing/clearing by clicking and dragging on canvas
     const canvasBox = await canvas.boundingBox();
 
-    // Draw across canvas to clear mud
-    for (let i = 0; i < 10; i++) {
-      await page.mouse.move(canvasBox.x + 50, canvasBox.y + 30 * i);
+    // Draw across canvas to clear mud - need to clear 95% for game to end
+    // Draw more thoroughly with overlapping strokes
+    for (let i = 0; i < 15; i++) {
+      await page.mouse.move(canvasBox.x + 20, canvasBox.y + 20 * i);
       await page.mouse.down();
-      await page.mouse.move(canvasBox.x + canvasBox.width - 50, canvasBox.y + 30 * i);
+      await page.mouse.move(canvasBox.x + canvasBox.width - 20, canvasBox.y + 20 * i);
       await page.mouse.up();
     }
 
-    // Wait for game to end (should auto-advance at ~80% cleared)
+    // Wait for game to end (should auto-advance at 95% cleared)
     await page.waitForTimeout(3000);
 
     // Verify intermission ended and returned to game
