@@ -9,13 +9,22 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <select id="language-select">
+            <option value="en">🇬🇧 English</option>
+            <option value="fr">🇧🇪 Français</option>
+            <option value="es">🇪🇨 Español</option>
+        </select>
+    </div>
+
     <!-- Splash Screen -->
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
-            <h1 class="splash-title">🚙 Monster Truck Match 🚙</h1>
-            <p class="splash-subtitle">Match the shapes and colors!</p>
+            <h1 class="splash-title" data-i18n="splash-title">🚙 Monster Truck Match 🚙</h1>
+            <p class="splash-subtitle" data-i18n="splash-subtitle">Match the shapes and colors!</p>
             <img src="monster_truck.png" alt="Monster Truck" class="splash-truck">
-            <button id="start-game-btn" class="start-game-button">START GAME</button>
+            <button id="start-game-btn" class="start-game-button" data-i18n="start-game">START GAME</button>
         </div>
     </div>
 
@@ -24,7 +33,7 @@
 
         <!-- Level Counter (hidden but tracked) -->
         <div id="level-display" class="level-display">
-            Level <span id="level-number">1</span>
+            <span data-i18n="level">Level</span> <span id="level-number">1</span>
         </div>
 
         <!-- Truck Area (Top 60%) -->
@@ -61,7 +70,7 @@
 
         <!-- Celebration Overlay -->
         <div id="celebration-overlay" class="celebration-overlay hidden">
-            <div class="celebration-text">🎉 Amazing! 🎉</div>
+            <div class="celebration-text" data-i18n="amazing">🎉 Amazing! 🎉</div>
         </div>
 
         <!-- Intermission Container -->
@@ -69,8 +78,8 @@
 
             <!-- Mud Wash Game -->
             <div id="mud-wash-game" class="mini-game hidden">
-                <div class="mini-game-title">🧽 Wash the Truck! 🧽</div>
-                <div class="mini-game-instructions">Swipe to clean off the mud!</div>
+                <div class="mini-game-title" data-i18n="mud-wash-title">🧽 Wash the Truck! 🧽</div>
+                <div class="mini-game-instructions" data-i18n="mud-wash-instructions">Swipe to clean off the mud!</div>
                 <div class="canvas-container">
                     <canvas id="mud-canvas"></canvas>
                     <div id="clean-truck" class="clean-truck">
@@ -78,7 +87,7 @@
                     </div>
                 </div>
                 <div class="mud-progress-container">
-                    <div class="mud-progress-label">Cleaned: <span id="mud-progress-text">0%</span></div>
+                    <div class="mud-progress-label"><span data-i18n="cleaned">Cleaned:</span> <span id="mud-progress-text">0%</span></div>
                     <div class="mud-progress-bar">
                         <div id="mud-progress-fill" class="mud-progress-fill"></div>
                     </div>
@@ -87,8 +96,8 @@
 
             <!-- Sticker Shop Game -->
             <div id="sticker-shop-game" class="mini-game hidden">
-                <div class="mini-game-title">✨ Decorate Your Truck! ✨</div>
-                <div class="mini-game-instructions">Drag stickers onto your truck, then click DONE!</div>
+                <div class="mini-game-title" data-i18n="sticker-shop-title">✨ Decorate Your Truck! ✨</div>
+                <div class="mini-game-instructions" data-i18n="sticker-shop-instructions">Drag stickers onto your truck, then click DONE!</div>
                 <div id="sticker-truck-area" class="sticker-truck-area">
                     <div class="truck-body large">
                         <div class="truck-cabin">🚙</div>
@@ -101,28 +110,28 @@
                     <div class="sticker" draggable="true">🎉</div>
                     <div class="sticker" draggable="true">🌈</div>
                 </div>
-                <button id="sticker-done-btn" class="giant-button">DONE!</button>
+                <button id="sticker-done-btn" class="giant-button" data-i18n="done">DONE!</button>
             </div>
 
             <!-- Big Jump Game -->
             <div id="big-jump-game" class="mini-game hidden">
-                <div class="mini-game-title">🚀 BIG JUMP! 🚀</div>
-                <div class="mini-game-instructions">Click JUMP to do a backflip!</div>
+                <div class="mini-game-title" data-i18n="big-jump-title">🚀 BIG JUMP! 🚀</div>
+                <div class="mini-game-instructions" data-i18n="big-jump-instructions">Click JUMP to do a backflip!</div>
                 <div id="jump-scene" class="jump-scene">
                     <div id="jump-truck" class="jump-truck">
                         <img src="monster_truck.png" alt="Monster Truck" class="truck-image">
                     </div>
                 </div>
-                <button id="jump-btn" class="giant-button jump-button">JUMP!</button>
+                <button id="jump-btn" class="giant-button jump-button" data-i18n="jump">JUMP!</button>
                 <div id="fireworks-container" class="fireworks-container"></div>
             </div>
 
             <!-- Bubble Wrap Game -->
             <div id="bubble-wrap-game" class="mini-game hidden">
-                <div class="mini-game-title">🎈 POP THE BUBBLES! 🎈</div>
-                <div class="mini-game-instructions">Tap all the bubbles to pop them!</div>
+                <div class="mini-game-title" data-i18n="bubble-wrap-title">🎈 POP THE BUBBLES! 🎈</div>
+                <div class="mini-game-instructions" data-i18n="bubble-wrap-instructions">Tap all the bubbles to pop them!</div>
                 <div class="bubble-counter">
-                    <span id="bubbles-popped">0</span> / <span id="bubbles-total">12</span> popped
+                    <span id="bubbles-popped">0</span> / <span id="bubbles-total">12</span> <span data-i18n="popped">popped</span>
                 </div>
                 <div id="bubble-grid" class="bubble-grid">
                     <!-- Bubbles will be generated by JavaScript -->
