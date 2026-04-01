@@ -765,8 +765,10 @@ function startBigJumpGame() {
     const jumpTruck = document.getElementById('jump-truck');
     const jumpBtn = document.getElementById('jump-btn');
 
-    // Reset animation
+    // Reset animation and positioning
     jumpTruck.classList.remove('jumping');
+    jumpTruck.style.left = '-200px';
+    jumpTruck.style.transform = 'none';
     jumpTruck.style.animation = 'driveToRamp 3s ease-in-out forwards';
 
     let hasJumped = false;
@@ -776,7 +778,12 @@ function startBigJumpGame() {
             hasJumped = true;
             playSound('jump');
 
+            // Stop the drive animation and get current position
+            const currentLeft = jumpTruck.offsetLeft;
             jumpTruck.style.animation = '';
+            jumpTruck.style.left = currentLeft + 'px';
+
+            // Start jump animation
             jumpTruck.classList.add('jumping');
 
             createFireworks();
@@ -832,5 +839,41 @@ function shuffleArray(array) {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚙 Monster Truck Match - Starting!');
-    generateLevel(gameState.levelCount);
+
+    // Check for URL parameters to trigger specific mini-games (for testing)
+    const urlParams = new URLSearchParams(window.location.search);
+    const testMinigame = urlParams.get('minigame');
+
+    if (testMinigame) {
+        console.log(`🧪 Testing mini-game: ${testMinigame}`);
+        // Hide game container and show intermission
+        document.getElementById('game-container').style.display = 'none';
+        triggerIntermission();
+
+        // Override random selection to show specific mini-game
+        setTimeout(() => {
+            switch (testMinigame) {
+                case 'mud-wash':
+                case 'wash':
+                    document.querySelectorAll('.mini-game').forEach(g => g.classList.add('hidden'));
+                    startMudWashGame();
+                    break;
+                case 'sticker-shop':
+                case 'stickers':
+                    document.querySelectorAll('.mini-game').forEach(g => g.classList.add('hidden'));
+                    startStickerShopGame();
+                    break;
+                case 'big-jump':
+                case 'jump':
+                    document.querySelectorAll('.mini-game').forEach(g => g.classList.add('hidden'));
+                    startBigJumpGame();
+                    break;
+                default:
+                    console.warn(`Unknown mini-game: ${testMinigame}`);
+                    console.log('Available mini-games: mud-wash, sticker-shop, big-jump');
+            }
+        }, 100);
+    } else {
+        generateLevel(gameState.levelCount);
+    }
 });

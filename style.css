@@ -969,6 +969,8 @@ body::after {
     bottom: 50px;
     left: -200px;
     animation: driveToRamp 3s ease-in-out forwards;
+    /* Ensure no transform is applied by default */
+    transform: none;
 }
 
 .jump-truck .truck-body {
@@ -983,6 +985,8 @@ body::after {
         0 10px 30px rgba(0, 0, 0, 0.5),
         inset 0 -10px 20px rgba(0, 0, 0, 0.2),
         inset 0 5px 15px rgba(255, 255, 255, 0.3);
+    /* Ensure truck body doesn't affect positioning */
+    transform: none;
 }
 
 .jump-truck .truck-cabin {
