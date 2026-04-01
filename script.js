@@ -9,7 +9,10 @@ const gameState = {
     dragOffset: { x: 0, y: 0 },
     slots: [],
     inventory: [],
-    isInIntermission: false
+    isInIntermission: false,
+    rafId: null, // requestAnimationFrame ID for drag updates
+    currentHoverSlot: null, // Track currently highlighted slot to avoid unnecessary DOM updates
+    slotRects: [] // Cached slot positions for fast collision detection during drag
 };
 
 // ===================================
@@ -283,16 +286,24 @@ function handleDragStart(e) {
     item.style.zIndex = '1000';
     item.style.pointerEvents = 'none';
 
-    // Remove transforms/animations that interfere with positioning
+    // Remove animations that interfere with positioning
     item.style.animation = 'none';
-    item.style.transform = 'none';
 
     // Add dragging class (which now has no transforms)
     item.classList.add('dragging');
 
-    // NOW set coordinates to where item currently is (in viewport coords)
-    item.style.left = `${rect.left}px`;
-    item.style.top = `${rect.top}px`;
+    // Use transform for positioning (GPU accelerated)
+    // Set initial position to where item currently is (in viewport coords)
+    item.style.left = '0px';
+    item.style.top = '0px';
+    item.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+
+    // Cache slot positions for fast collision detection (avoid repeated getBoundingClientRect)
+    const slots = document.querySelectorAll('.slot');
+    gameState.slotRects = Array.from(slots).map(slot => ({
+        element: slot,
+        rect: slot.getBoundingClientRect()
+    }));
 
     // Add move and end listeners
     document.addEventListener('mousemove', handleDragMove);
@@ -309,20 +320,41 @@ function handleDragMove(e) {
     const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-    const item = gameState.currentDragItem;
-    item.style.left = `${clientX - gameState.dragOffset.x}px`;
-    item.style.top = `${clientY - gameState.dragOffset.y}px`;
-
-    // Visual feedback: highlight slot being hovered over
-    const slot = findSlotAtPosition(clientX, clientY);
-
-    // Remove highlight from all slots
-    document.querySelectorAll('.slot').forEach(s => s.classList.remove('hover-highlight'));
-
-    // Add highlight to hovered slot if it's not filled
-    if (slot && !slot.classList.contains('filled')) {
-        slot.classList.add('hover-highlight');
+    // Cancel any pending animation frame to avoid stacking
+    if (gameState.rafId) {
+        cancelAnimationFrame(gameState.rafId);
     }
+
+    // Use requestAnimationFrame for smooth 60fps updates
+    gameState.rafId = requestAnimationFrame(() => {
+        const item = gameState.currentDragItem;
+        if (!item) return;
+
+        // Use transform for GPU-accelerated positioning
+        const x = clientX - gameState.dragOffset.x;
+        const y = clientY - gameState.dragOffset.y;
+        item.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+        // Visual feedback: highlight slot being hovered over
+        const slot = findSlotAtPosition(clientX, clientY);
+
+        // Only update slot highlights if the hovered slot changed (avoid unnecessary DOM manipulation)
+        if (slot !== gameState.currentHoverSlot) {
+            // Remove highlight from previous slot
+            if (gameState.currentHoverSlot) {
+                gameState.currentHoverSlot.classList.remove('hover-highlight');
+            }
+
+            // Add highlight to new slot if it's not filled
+            if (slot && !slot.classList.contains('filled')) {
+                slot.classList.add('hover-highlight');
+            }
+
+            gameState.currentHoverSlot = slot;
+        }
+
+        gameState.rafId = null;
+    });
 }
 
 function handleDragEnd(e) {
@@ -332,8 +364,11 @@ function handleDragEnd(e) {
     const clientX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
     const clientY = e.type === 'touchend' ? e.changedTouches[0].clientY : e.clientY;
 
-    // Remove all hover highlights
-    document.querySelectorAll('.slot').forEach(s => s.classList.remove('hover-highlight'));
+    // Remove highlight from current hover slot
+    if (gameState.currentHoverSlot) {
+        gameState.currentHoverSlot.classList.remove('hover-highlight');
+        gameState.currentHoverSlot = null;
+    }
 
     // Check if dropped on a slot
     const slot = findSlotAtPosition(clientX, clientY);
@@ -356,15 +391,23 @@ function handleDragEnd(e) {
     document.removeEventListener('mouseup', handleDragEnd);
     document.removeEventListener('touchend', handleDragEnd);
 
+    // Cancel any pending animation frame
+    if (gameState.rafId) {
+        cancelAnimationFrame(gameState.rafId);
+        gameState.rafId = null;
+    }
+
+    // Clear cached slot positions
+    gameState.slotRects = [];
+
     gameState.currentDragItem = null;
 }
 
 function findSlotAtPosition(x, y) {
-    const slots = document.querySelectorAll('.slot');
-    for (const slot of slots) {
-        const rect = slot.getBoundingClientRect();
+    // Use cached slot positions for performance (avoid repeated getBoundingClientRect)
+    for (const {element, rect} of gameState.slotRects) {
         if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-            return slot;
+            return element;
         }
     }
     return null;
@@ -398,8 +441,9 @@ function handleSuccessfulMatch(item, slot) {
     // Clone and place in slot
     const clone = item.cloneNode(true);
     clone.style.position = 'relative';
-    clone.style.left = '0';
-    clone.style.top = '0';
+    clone.style.left = '';
+    clone.style.top = '';
+    clone.style.transform = '';
     clone.style.pointerEvents = 'none';
     clone.classList.remove('dragging');
     clone.classList.add('snapping');
@@ -438,14 +482,14 @@ function handleFailedMatch(item) {
     item.classList.remove('dragging');
     item.classList.add('bouncing');
     item.style.position = 'relative';
-    item.style.left = '0';
-    item.style.top = '0';
+    item.style.left = '';
+    item.style.top = '';
+    item.style.transform = '';
     item.style.zIndex = '';
     item.style.pointerEvents = '';
 
-    // Restore animations/transforms
+    // Restore animations
     item.style.animation = '';
-    item.style.transform = '';
 
     setTimeout(() => {
         item.classList.remove('bouncing');
@@ -905,6 +949,9 @@ function shuffleArray(array) {
     }
 }
 
+// Rainbow effect removed - caused emoji rendering issues
+// Text is now solid white with black stroke for maximum readability
+
 // ===================================
 // INITIALIZE GAME
 // ===================================
@@ -912,54 +959,70 @@ function shuffleArray(array) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚙 Monster Truck Match - Starting!');
 
-    // Check for URL parameters to trigger specific mini-games (for testing)
-    const urlParams = new URLSearchParams(window.location.search);
-    const testMinigame = urlParams.get('minigame');
+    // Handle start game button
+    const startGameBtn = document.getElementById('start-game-btn');
+    const splashScreen = document.getElementById('splash-screen');
+    const gameContainer = document.getElementById('game-container');
 
-    if (testMinigame) {
-        console.log(`🧪 Testing mini-game: ${testMinigame}`);
+    startGameBtn.addEventListener('click', () => {
+        playSound('success');
 
-        // Manually show intermission container
-        const intermissionContainer = document.getElementById('intermission-container');
-        intermissionContainer.classList.remove('hidden');
-        gameState.isInIntermission = true;
+        // Hide splash screen
+        splashScreen.classList.add('hidden');
 
-        // Hide all mini-games first
-        document.querySelectorAll('.mini-game').forEach(g => g.classList.add('hidden'));
+        // Show game container
+        gameContainer.classList.remove('hidden');
 
-        // Show specific mini-game
-        setTimeout(() => {
-            switch (testMinigame) {
-                case 'mud-wash':
-                case 'wash':
-                    console.log('🧽 Starting Mud Wash');
-                    startMudWashGame();
-                    break;
-                case 'sticker-shop':
-                case 'stickers':
-                    console.log('✨ Starting Sticker Shop');
-                    startStickerShopGame();
-                    break;
-                case 'big-jump':
-                case 'jump':
-                    console.log('🚀 Starting Big Jump');
-                    startBigJumpGame();
-                    break;
-                case 'bubble-wrap':
-                case 'bubbles':
-                    console.log('🎈 Starting Bubble Wrap');
-                    startBubbleWrapGame();
-                    break;
-                default:
-                    console.warn(`❌ Unknown mini-game: ${testMinigame}`);
-                    console.log('Available: mud-wash, sticker-shop, big-jump');
-                    // Show normal game if unknown
-                    intermissionContainer.classList.add('hidden');
-                    gameState.isInIntermission = false;
-                    generateLevel(gameState.levelCount);
-            }
-        }, 100);
-    } else {
-        generateLevel(gameState.levelCount);
-    }
+        // Check for URL parameters to trigger specific mini-games (for testing)
+        const urlParams = new URLSearchParams(window.location.search);
+        const testMinigame = urlParams.get('minigame');
+
+        if (testMinigame) {
+            console.log(`🧪 Testing mini-game: ${testMinigame}`);
+
+            // Manually show intermission container
+            const intermissionContainer = document.getElementById('intermission-container');
+            intermissionContainer.classList.remove('hidden');
+            gameState.isInIntermission = true;
+
+            // Hide all mini-games first
+            document.querySelectorAll('.mini-game').forEach(g => g.classList.add('hidden'));
+
+            // Show specific mini-game
+            setTimeout(() => {
+                switch (testMinigame) {
+                    case 'mud-wash':
+                    case 'wash':
+                        console.log('🧽 Starting Mud Wash');
+                        startMudWashGame();
+                        break;
+                    case 'sticker-shop':
+                    case 'stickers':
+                        console.log('✨ Starting Sticker Shop');
+                        startStickerShopGame();
+                        break;
+                    case 'big-jump':
+                    case 'jump':
+                        console.log('🚀 Starting Big Jump');
+                        startBigJumpGame();
+                        break;
+                    case 'bubble-wrap':
+                    case 'bubbles':
+                        console.log('🎈 Starting Bubble Wrap');
+                        startBubbleWrapGame();
+                        break;
+                    default:
+                        console.warn(`❌ Unknown mini-game: ${testMinigame}`);
+                        console.log('Available: mud-wash, sticker-shop, big-jump');
+                        // Show normal game if unknown
+                        intermissionContainer.classList.add('hidden');
+                        gameState.isInIntermission = false;
+                        generateLevel(gameState.levelCount);
+                }
+            }, 100);
+        } else {
+            // Start normal game
+            generateLevel(gameState.levelCount);
+        }
+    });
 });

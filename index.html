@@ -9,8 +9,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">🚙 Monster Truck Match 🚙</h1>
+            <p class="splash-subtitle">Match the shapes and colors!</p>
+            <img src="monster_truck.png" alt="Monster Truck" class="splash-truck">
+            <button id="start-game-btn" class="start-game-button">START GAME</button>
+        </div>
+    </div>
+
     <!-- Main Game Container -->
-    <div id="game-container">
+    <div id="game-container" class="hidden">
 
         <!-- Level Counter (hidden but tracked) -->
         <div id="level-display" class="level-display">
@@ -64,9 +74,7 @@
                 <div class="canvas-container">
                     <canvas id="mud-canvas"></canvas>
                     <div id="clean-truck" class="clean-truck">
-                        <div class="truck-body">
-                            <div class="truck-cabin">🚙</div>
-                        </div>
+                        <img src="monster_truck.png" alt="Monster Truck" class="mud-truck-image">
                     </div>
                 </div>
                 <div class="mud-progress-container">

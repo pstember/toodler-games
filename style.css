@@ -72,6 +72,121 @@ body::after {
 }
 
 /* ===================================
+   SPLASH SCREEN
+   =================================== */
+
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+    animation: fadeIn 0.3s ease;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.splash-screen.hidden {
+    display: none;
+}
+
+.splash-content {
+    text-align: center;
+    padding: 40px;
+    max-width: 600px;
+}
+
+.splash-title {
+    font-size: 64px;
+    font-weight: 900;
+    color: #FFD700;
+    text-shadow:
+        3px 3px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000,
+        0 0 20px rgba(255, 215, 0, 0.8),
+        0 0 40px rgba(255, 215, 0, 0.6);
+    margin-bottom: 20px;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+    animation: titleBounce 1s ease-in-out infinite;
+}
+
+.splash-subtitle {
+    font-size: 32px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-shadow:
+        2px 2px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000;
+    margin-bottom: 40px;
+}
+
+.splash-truck {
+    width: 300px;
+    height: auto;
+    display: block;
+    margin: 0 auto 40px auto;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+    animation: truckBounce 1s ease-in-out infinite;
+}
+
+@keyframes truckBounce {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+.start-game-button {
+    width: 300px;
+    height: 120px;
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+    border: 6px solid #FFFFFF;
+    border-radius: 30px;
+    cursor: pointer;
+    touch-action: none;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.5),
+        inset 0 -4px 8px rgba(0,0,0,0.2);
+    text-shadow:
+        2px 2px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000;
+    transition: all 0.2s ease;
+}
+
+.start-game-button:hover {
+    transform: scale(1.05);
+    box-shadow:
+        0 15px 40px rgba(0,0,0,0.6),
+        inset 0 -4px 8px rgba(0,0,0,0.2);
+}
+
+.start-game-button:active {
+    transform: scale(0.95);
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.5),
+        inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+
+/* ===================================
    GAME CONTAINER
    =================================== */
 
@@ -391,6 +506,10 @@ body::after {
     cursor: grabbing;
     /* Removed wiggle animation - causes position jitter during drag */
     /* animation: wiggle 0.3s ease infinite; */
+    /* GPU acceleration for smooth dragging */
+    will-change: transform;
+    /* Disable transitions during drag */
+    transition: none;
 }
 
 @keyframes float {
@@ -859,20 +978,18 @@ body::after {
 
 .celebration-text {
     font-size: 72px;
-    font-weight: bold;
-    background: linear-gradient(45deg,
-        #FFD700, #FFA500, #FF1493, #00CED1, #32CD32, #FFD700
-    );
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+    color: #FFD700;
     text-shadow:
+        3px 3px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000,
         0 0 20px rgba(255, 215, 0, 0.8),
-        0 0 40px rgba(255, 105, 180, 0.6),
-        4px 4px 8px rgba(0,0,0,0.8);
-    animation: bounce 0.6s ease infinite, rainbow 3s linear infinite;
-    filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
+        0 0 40px rgba(255, 215, 0, 0.6);
+    animation: bounce 0.6s ease infinite;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+    letter-spacing: 0.05em;
 }
 
 @keyframes fadeIn {
@@ -895,17 +1012,6 @@ body::after {
     }
 }
 
-@keyframes rainbow {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
 
 /* ===================================
    INTERMISSION CONTAINER
@@ -940,34 +1046,37 @@ body::after {
 
 .mini-game-title {
     font-size: 56px;
-    font-weight: bold;
-    background: linear-gradient(45deg,
-        #FFD700, #FFA500, #FF1493, #00CED1, #FFD700
-    );
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+    color: #FFD700;
     text-shadow:
+        3px 3px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000,
         0 0 20px rgba(255, 215, 0, 0.8),
-        0 0 40px rgba(255, 105, 180, 0.6);
+        0 0 30px rgba(255, 215, 0, 0.5);
     margin-bottom: 20px;
-    animation: rainbow 3s linear infinite, titleBounce 1s ease-in-out infinite;
-    filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5));
+    animation: titleBounce 1s ease-in-out infinite;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+    letter-spacing: 0.05em;
 }
 
 .mini-game-instructions {
     font-size: 32px;
-    font-weight: bold;
+    font-weight: 700;
     color: #FFFFFF;
     text-shadow:
-        2px 2px 4px rgba(0,0,0,0.8),
-        0 0 10px rgba(255, 215, 0, 0.5);
+        2px 2px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000,
+        0 0 10px rgba(0, 0, 0, 0.8);
     margin-bottom: 20px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
     padding: 15px 30px;
     border-radius: 20px;
-    border: 3px solid rgba(255, 215, 0, 0.6);
+    border: 4px solid #FFFFFF;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
 }
 
 @keyframes titleBounce {
@@ -1004,10 +1113,18 @@ body::after {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.clean-truck .truck-body {
-    background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+.mud-truck-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
 }
 
 .mud-progress-container {
@@ -1521,6 +1638,26 @@ body::after {
         padding: 15px;
         max-width: 90vw;
     }
+
+    .splash-title {
+        font-size: 40px;
+    }
+
+    .splash-subtitle {
+        font-size: 24px;
+    }
+
+    .splash-truck {
+        width: 200px;
+        margin-bottom: 30px;
+    }
+
+    .start-game-button {
+        width: 80vw;
+        max-width: 280px;
+        height: 100px;
+        font-size: 36px;
+    }
 }
 
 /* Small phones */
@@ -1638,6 +1775,26 @@ body::after {
         gap: 12px;
         padding: 12px;
         max-width: 85vw;
+    }
+
+    .splash-title {
+        font-size: 32px;
+    }
+
+    .splash-subtitle {
+        font-size: 20px;
+    }
+
+    .splash-truck {
+        width: 150px;
+        margin-bottom: 25px;
+    }
+
+    .start-game-button {
+        width: 85vw;
+        max-width: 240px;
+        height: 80px;
+        font-size: 28px;
     }
 }
 
