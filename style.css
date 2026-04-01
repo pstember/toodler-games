@@ -613,25 +613,6 @@ body::after {
 .diamond.color-brown { background-image: url('images/tires/diamond-brown.svg'); }
 .diamond.color-lime { background-image: url('images/tires/diamond-lime.svg'); }
 
-.oval {
-    width: var(--size-large);
-    height: var(--size-large);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.oval.color-red { background-image: url('images/tires/oval-red.svg'); }
-.oval.color-blue { background-image: url('images/tires/oval-blue.svg'); }
-.oval.color-green { background-image: url('images/tires/oval-green.svg'); }
-.oval.color-yellow { background-image: url('images/tires/oval-yellow.svg'); }
-.oval.color-purple { background-image: url('images/tires/oval-purple.svg'); }
-.oval.color-orange { background-image: url('images/tires/oval-orange.svg'); }
-.oval.color-pink { background-image: url('images/tires/oval-pink.svg'); }
-.oval.color-cyan { background-image: url('images/tires/oval-cyan.svg'); }
-.oval.color-brown { background-image: url('images/tires/oval-brown.svg'); }
-.oval.color-lime { background-image: url('images/tires/oval-lime.svg'); }
-
 /* Size Modifiers */
 .size-large {
     --size-large: 120px;
