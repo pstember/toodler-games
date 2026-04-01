@@ -994,16 +994,16 @@ body::after {
         transform: translateX(0) translateY(0) rotate(0deg);
     }
     25% {
-        transform: translateX(10vw) translateY(-150px) rotate(-90deg);
+        transform: translateX(10vw) translateY(-150px) rotate(90deg);
     }
     50% {
-        transform: translateX(20vw) translateY(-250px) rotate(-180deg);
+        transform: translateX(20vw) translateY(-250px) rotate(180deg);
     }
     75% {
-        transform: translateX(30vw) translateY(-150px) rotate(-270deg);
+        transform: translateX(30vw) translateY(-150px) rotate(270deg);
     }
     100% {
-        transform: translateX(40vw) translateY(0) rotate(-360deg);
+        transform: translateX(40vw) translateY(0) rotate(360deg);
     }
 }
 
@@ -1340,16 +1340,16 @@ body::after {
             transform: translateX(0) translateY(0) rotate(0deg);
         }
         25% {
-            transform: translateX(10vw) translateY(-80px) rotate(-90deg);
+            transform: translateX(10vw) translateY(-80px) rotate(90deg);
         }
         50% {
-            transform: translateX(20vw) translateY(-120px) rotate(-180deg);
+            transform: translateX(20vw) translateY(-120px) rotate(180deg);
         }
         75% {
-            transform: translateX(30vw) translateY(-80px) rotate(-270deg);
+            transform: translateX(30vw) translateY(-80px) rotate(270deg);
         }
         100% {
-            transform: translateX(40vw) translateY(0) rotate(-360deg);
+            transform: translateX(40vw) translateY(0) rotate(360deg);
         }
     }
 
@@ -1417,16 +1417,16 @@ body::after {
             transform: translateX(0) translateY(0) rotate(0deg);
         }
         25% {
-            transform: translateX(10vw) translateY(-100px) rotate(-90deg);
+            transform: translateX(10vw) translateY(-100px) rotate(90deg);
         }
         50% {
-            transform: translateX(20vw) translateY(-160px) rotate(-180deg);
+            transform: translateX(20vw) translateY(-160px) rotate(180deg);
         }
         75% {
-            transform: translateX(30vw) translateY(-100px) rotate(-270deg);
+            transform: translateX(30vw) translateY(-100px) rotate(270deg);
         }
         100% {
-            transform: translateX(40vw) translateY(0) rotate(-360deg);
+            transform: translateX(40vw) translateY(0) rotate(360deg);
         }
     }
 
