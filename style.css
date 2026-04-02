@@ -46,7 +46,7 @@
 
 body {
     font-family: 'Comic Sans MS', 'Arial', sans-serif;
-    background: url('background.png') center center / cover no-repeat fixed;
+    background: url('assets/background.png') center center / cover no-repeat fixed;
     overflow: hidden;
     touch-action: none;
     user-select: none;
