@@ -191,8 +191,8 @@ function generateLevel(level) {
 
     const slotsContainer = document.getElementById('slots-container');
     const inventoryContainer = document.getElementById('inventory-items');
-    slotsContainer.innerHTML = '';
-    inventoryContainer.innerHTML = '';
+    clearContainer(slotsContainer);
+    clearContainer(inventoryContainer);
 
     // Generate target slots (ensure no duplicate slot requirements)
     const slotRequirements = [];
@@ -628,7 +628,7 @@ function checkLevelComplete() {
 
 function createConfetti() {
     const container = document.getElementById('confetti-container');
-    container.innerHTML = '';
+    clearContainer(container);
 
     const colors = ['#FF4444', '#4444FF', '#44FF44', '#FFFF44', '#AA44FF', '#FF8844'];
 
@@ -644,7 +644,7 @@ function createConfetti() {
 
     // Clear after animation
     setTimeout(() => {
-        container.innerHTML = '';
+        clearContainer(container);
     }, 3000);
 }
 
@@ -694,6 +694,10 @@ function triggerIntermission() {
 function endIntermission() {
     console.log('🏁 Ending Intermission');
 
+    // Clean up event listeners to prevent memory leaks
+    cleanupMudWashListeners();
+    cleanupStickerListeners();
+
     const intermissionContainer = document.getElementById('intermission-container');
     intermissionContainer.classList.add('hidden');
 
@@ -712,6 +716,9 @@ function endIntermission() {
 // ===================================
 // MUD WASH GAME
 // ===================================
+
+// Store mud wash listeners for cleanup
+let mudWashListeners = null;
 
 function startMudWashGame() {
     const game = document.getElementById('mud-wash-game');
@@ -743,6 +750,11 @@ function startMudWashGame() {
     const totalPixels = canvas.width * canvas.height;
     let gameEnding = false; // Prevent multiple calls to endIntermission
     let checkCounter = 0; // Throttle pixel checking
+    let lastProgressUpdate = 0; // Timestamp of last progress calculation
+    const PROGRESS_UPDATE_INTERVAL = 100; // Max 10fps for progress updates
+    let rafId = null; // RequestAnimationFrame ID
+    let cachedCanvasRect = canvas.getBoundingClientRect(); // Cache canvas rect
+    let currentMousePos = { x: 0, y: 0 }; // Track current position
 
     // Progress bar elements
     const progressFill = document.getElementById('mud-progress-fill');
@@ -764,6 +776,13 @@ function startMudWashGame() {
     }
 
     function updateProgress() {
+        // Throttle progress updates to max 10fps (100ms intervals)
+        const now = Date.now();
+        if (now - lastProgressUpdate < PROGRESS_UPDATE_INTERVAL) {
+            return;
+        }
+        lastProgressUpdate = now;
+
         const percentCleared = calculateClearedPercentage();
         const displayPercent = Math.min(99, Math.floor(percentCleared)); // Cap at 99% until complete
 
@@ -795,42 +814,136 @@ function startMudWashGame() {
         }
     }
 
+    // RAF-based drawing loop for smooth performance
+    function drawLoop() {
+        if (isDrawing && currentMousePos.x !== null) {
+            clearMud(currentMousePos.x, currentMousePos.y);
+        }
+
+        if (isDrawing) {
+            rafId = requestAnimationFrame(drawLoop);
+        }
+    }
+
     // Initial progress
     updateProgress();
 
-    canvas.addEventListener('mousedown', () => isDrawing = true);
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mousemove', (e) => {
-        if (isDrawing) {
-            const rect = canvas.getBoundingClientRect();
-            clearMud(e.clientX - rect.left, e.clientY - rect.top);
+    // Create listener functions for cleanup
+    const onMouseDown = () => {
+        isDrawing = true;
+        if (!rafId) {
+            rafId = requestAnimationFrame(drawLoop);
         }
-    });
+    };
 
-    canvas.addEventListener('touchstart', (e) => {
+    const onMouseUp = () => {
+        isDrawing = false;
+        currentMousePos = { x: null, y: null };
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+    };
+
+    const onMouseMove = (e) => {
+        if (isDrawing) {
+            // Just update position - RAF loop handles drawing
+            currentMousePos = {
+                x: e.clientX - cachedCanvasRect.left,
+                y: e.clientY - cachedCanvasRect.top
+            };
+        }
+    };
+
+    const onTouchStart = (e) => {
         e.preventDefault();
         isDrawing = true;
-    });
-    canvas.addEventListener('touchend', () => isDrawing = false);
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        if (isDrawing) {
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            clearMud(touch.clientX - rect.left, touch.clientY - rect.top);
+        if (!rafId) {
+            rafId = requestAnimationFrame(drawLoop);
         }
-    });
+    };
+
+    const onTouchEnd = () => {
+        isDrawing = false;
+        currentMousePos = { x: null, y: null };
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+    };
+
+    const onTouchMove = (e) => {
+        e.preventDefault();
+        if (isDrawing && e.touches[0]) {
+            const touch = e.touches[0];
+            // Just update position - RAF loop handles drawing
+            currentMousePos = {
+                x: touch.clientX - cachedCanvasRect.left,
+                y: touch.clientY - cachedCanvasRect.top
+            };
+        }
+    };
+
+    // Add event listeners
+    canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('mouseup', onMouseUp);
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('touchstart', onTouchStart);
+    canvas.addEventListener('touchend', onTouchEnd);
+    canvas.addEventListener('touchmove', onTouchMove);
+
+    // Store listeners and RAF ID for cleanup
+    mudWashListeners = {
+        canvas,
+        rafId: () => rafId, // Function to get current RAF ID
+        cancelRaf: () => {
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+        },
+        listeners: [
+            { type: 'mousedown', handler: onMouseDown },
+            { type: 'mouseup', handler: onMouseUp },
+            { type: 'mousemove', handler: onMouseMove },
+            { type: 'touchstart', handler: onTouchStart },
+            { type: 'touchend', handler: onTouchEnd },
+            { type: 'touchmove', handler: onTouchMove }
+        ]
+    };
+}
+
+function cleanupMudWashListeners() {
+    if (mudWashListeners) {
+        const { canvas, listeners, cancelRaf } = mudWashListeners;
+
+        // Cancel any pending animation frame
+        cancelRaf();
+
+        // Remove event listeners
+        listeners.forEach(({ type, handler }) => {
+            canvas.removeEventListener(type, handler);
+        });
+
+        mudWashListeners = null;
+    }
 }
 
 // ===================================
 // STICKER SHOP GAME
 // ===================================
 
+// Store sticker listeners for cleanup
+let stickerListeners = [];
+
 function startStickerShopGame() {
     const game = document.getElementById('sticker-shop-game');
     game.classList.remove('hidden');
 
     const truckArea = document.getElementById('sticker-truck-area');
+
+    // Clean up old sticker listeners first
+    cleanupStickerListeners();
 
     // Reset stickers
     const stickers = document.querySelectorAll('.sticker');
@@ -840,9 +953,18 @@ function startStickerShopGame() {
         sticker.style.left = '';
         sticker.style.top = '';
 
-        // Add drag handlers
+        // Add drag handlers (store for cleanup)
         sticker.addEventListener('mousedown', handleStickerDragStart);
         sticker.addEventListener('touchstart', handleStickerDragStart);
+
+        // Store listener info for cleanup
+        stickerListeners.push({
+            element: sticker,
+            listeners: [
+                { type: 'mousedown', handler: handleStickerDragStart },
+                { type: 'touchstart', handler: handleStickerDragStart }
+            ]
+        });
     });
 
     let gameEnding = false; // Prevent multiple clicks
@@ -856,6 +978,15 @@ function startStickerShopGame() {
             endIntermission();
         }
     };
+}
+
+function cleanupStickerListeners() {
+    stickerListeners.forEach(({ element, listeners }) => {
+        listeners.forEach(({ type, handler }) => {
+            element.removeEventListener(type, handler);
+        });
+    });
+    stickerListeners = [];
 }
 
 function handleStickerDragStart(e) {
@@ -936,7 +1067,7 @@ function startBigJumpGame() {
 
 function createFireworks() {
     const container = document.getElementById('fireworks-container');
-    container.innerHTML = '';
+    clearContainer(container);
 
     const colors = ['#FF4444', '#4444FF', '#44FF44', '#FFFF44', '#AA44FF'];
 
@@ -957,7 +1088,7 @@ function createFireworks() {
     }
 
     setTimeout(() => {
-        container.innerHTML = '';
+        clearContainer(container);
     }, 2000);
 }
 
@@ -1001,7 +1132,7 @@ function startBubbleWrapGame() {
     bubblesPopped.textContent = '0';
 
     // Clear existing bubbles
-    bubbleGrid.innerHTML = '';
+    clearContainer(bubbleGrid);
 
     // Create bubbles
     for (let i = 0; i < totalBubbles; i++) {
@@ -1033,6 +1164,15 @@ function startBubbleWrapGame() {
 // ===================================
 // UTILITY FUNCTIONS
 // ===================================
+
+// Safe DOM clearing function to prevent XSS vulnerabilities
+function clearContainer(container) {
+    if (!container) return;
+
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+}
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {

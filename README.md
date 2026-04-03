@@ -37,7 +37,9 @@ Simply open `index.html` in any modern browser. Works best on mobile devices in 
 
 ## Development
 
-See `PLAN.md` for detailed implementation plan and architecture decisions.
+For detailed architecture documentation, see `ARCHITECTURE.md`.
+For testing guidelines, see `TESTING.md`.
+For contribution guidelines, see `CONTRIBUTING.md`.
 
 ### Testing Mini-Games
 
