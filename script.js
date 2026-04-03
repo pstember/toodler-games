@@ -336,6 +336,13 @@ function createDraggableItem(shape, color, size) {
 function handleDragStart(e) {
     e.preventDefault();
 
+    // Prevent starting a new drag if one is already in progress
+    // This prevents the multi-touch bug where touching a second item
+    // while dragging another causes the first item to get stuck
+    if (gameState.currentDragItem && e.type === 'touchstart') {
+        return;
+    }
+
     const item = e.currentTarget;
     gameState.currentDragItem = item;
 

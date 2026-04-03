@@ -44,6 +44,13 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html {
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+    width: 100vw;
+    height: 100vh;
+}
+
 body {
     font-family: 'Comic Sans MS', 'Arial', sans-serif;
     background: url('assets/background.png') center center / cover no-repeat fixed;
@@ -51,7 +58,10 @@ body {
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-text-size-adjust: 100%;
     position: relative;
+    width: 100vw;
+    height: 100vh;
 }
 
 body::before {
@@ -786,7 +796,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/tires/tire_circle.png');
+    background-image: url('assets/images/tires/tire_circle.png');
     background-size: 170%;
     background-repeat: no-repeat;
     background-position: center;
@@ -806,7 +816,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/tires/tire_square.png');
+    background-image: url('assets/images/tires/tire_square.png');
     background-size: 170%;
     background-repeat: no-repeat;
     background-position: center;
@@ -826,7 +836,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/tires/tire_triangle.png');
+    background-image: url('assets/images/tires/tire_triangle.png');
     background-size: 170%;
     background-repeat: no-repeat;
     background-position: center;
@@ -846,7 +856,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/tires/tire_star.png');
+    background-image: url('assets/images/tires/tire_star.png');
     background-size: 170%;
     background-repeat: no-repeat;
     background-position: center;
@@ -866,7 +876,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/tires/tire_heart.png');
+    background-image: url('assets/images/tires/tire_heart.png');
     background-size: 170%;
     background-repeat: no-repeat;
     background-position: center;
@@ -882,16 +892,16 @@ body::after {
     background-position: center;
 }
 
-.pentagon.color-red { background-image: url('images/tires/pentagon-red.svg'); }
-.pentagon.color-blue { background-image: url('images/tires/pentagon-blue.svg'); }
-.pentagon.color-green { background-image: url('images/tires/pentagon-green.svg'); }
-.pentagon.color-yellow { background-image: url('images/tires/pentagon-yellow.svg'); }
-.pentagon.color-purple { background-image: url('images/tires/pentagon-purple.svg'); }
-.pentagon.color-orange { background-image: url('images/tires/pentagon-orange.svg'); }
-.pentagon.color-pink { background-image: url('images/tires/pentagon-pink.svg'); }
-.pentagon.color-cyan { background-image: url('images/tires/pentagon-cyan.svg'); }
-.pentagon.color-brown { background-image: url('images/tires/pentagon-brown.svg'); }
-.pentagon.color-lime { background-image: url('images/tires/pentagon-lime.svg'); }
+.pentagon.color-red { background-image: url('assets/images/tires/pentagon-red.svg'); }
+.pentagon.color-blue { background-image: url('assets/images/tires/pentagon-blue.svg'); }
+.pentagon.color-green { background-image: url('assets/images/tires/pentagon-green.svg'); }
+.pentagon.color-yellow { background-image: url('assets/images/tires/pentagon-yellow.svg'); }
+.pentagon.color-purple { background-image: url('assets/images/tires/pentagon-purple.svg'); }
+.pentagon.color-orange { background-image: url('assets/images/tires/pentagon-orange.svg'); }
+.pentagon.color-pink { background-image: url('assets/images/tires/pentagon-pink.svg'); }
+.pentagon.color-cyan { background-image: url('assets/images/tires/pentagon-cyan.svg'); }
+.pentagon.color-brown { background-image: url('assets/images/tires/pentagon-brown.svg'); }
+.pentagon.color-lime { background-image: url('assets/images/tires/pentagon-lime.svg'); }
 
 .hexagon {
     width: var(--size-large);
@@ -905,7 +915,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/tires/tire_hexagon.png');
+    background-image: url('assets/images/tires/tire_hexagon.png');
     background-size: 170%;
     background-repeat: no-repeat;
     background-position: center;
@@ -925,7 +935,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/tires/tire_diamond.png');
+    background-image: url('assets/images/tires/tire_diamond.png');
     background-size: 130%;
     background-repeat: no-repeat;
     background-position: center;
