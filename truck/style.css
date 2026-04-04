@@ -109,14 +109,82 @@ body::after {
 }
 
 /* ===================================
-   LANGUAGE SELECTOR
+   TOP NAV (hub + theme + language)
    =================================== */
 
-.language-selector {
+.top-nav {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 30000;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.top-nav > *,
+.top-nav .top-nav__right {
+    pointer-events: auto;
+}
+
+.top-nav__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.hub-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 16px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    text-decoration: none;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+    border: 3px solid #ffffff;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000;
+    transition: transform 0.15s ease;
+}
+
+.hub-link:hover {
+    transform: scale(1.04);
+}
+
+.hub-link:active {
+    transform: scale(0.98);
+}
+
+.theme-select {
+    padding: 10px 14px;
+    font-size: 17px;
+    font-weight: bold;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+    border: 3px solid #ffffff;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000;
+}
+
+.theme-select option {
+    background: #1e3a8a;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.language-selector {
+    position: static;
 }
 
 .language-selector select {
@@ -320,7 +388,7 @@ body::after {
 
 .level-display {
     position: absolute;
-    top: 20px;
+    top: 72px;
     left: 20px;
     font-size: 36px;
     font-weight: bold;
@@ -1320,6 +1388,44 @@ body::after {
     }
 }
 
+/* Mud wash completion — big visible reward for toddlers */
+#mud-wash-game.mud-wash-celebrating .canvas-container {
+    animation: mudWashSparkleRing 0.9s ease-in-out infinite;
+    border-radius: 16px;
+    box-shadow:
+        0 0 0 4px rgba(255, 215, 0, 0.85),
+        0 0 28px rgba(78, 205, 196, 0.9),
+        0 0 48px rgba(255, 215, 0, 0.55);
+}
+
+#mud-wash-game.mud-wash-celebrating .mud-truck-image {
+    animation: mudWashTruckBounce 0.55s ease-in-out infinite;
+}
+
+@keyframes mudWashSparkleRing {
+    0%, 100% {
+        box-shadow:
+            0 0 0 4px rgba(255, 215, 0, 0.85),
+            0 0 28px rgba(78, 205, 196, 0.75),
+            0 0 48px rgba(255, 215, 0, 0.45);
+    }
+    50% {
+        box-shadow:
+            0 0 0 8px rgba(255, 140, 200, 0.75),
+            0 0 40px rgba(255, 215, 0, 0.95),
+            0 0 64px rgba(68, 229, 180, 0.65);
+    }
+}
+
+@keyframes mudWashTruckBounce {
+    0%, 100% {
+        transform: scale(1) rotate(-1deg);
+    }
+    50% {
+        transform: scale(1.08) rotate(1deg);
+    }
+}
+
 /* ===================================
    STICKER SHOP GAME
    =================================== */
@@ -2060,6 +2166,55 @@ body::after {
         font-size: 16px;
         padding: 4px 10px;
     }
+}
+
+/* ===================================
+   DARK THEME (toddler-games-theme)
+   =================================== */
+
+html[data-theme="dark"] body {
+    background-image: none;
+    background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 42%, #312e81 100%);
+}
+
+html[data-theme="dark"] .splash-screen {
+    background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
+}
+
+html[data-theme="dark"] .splash-title {
+    color: #fef9c3;
+    text-shadow:
+        3px 3px 0px #1e1b4b,
+        -1px -1px 0px #1e1b4b;
+}
+
+html[data-theme="dark"] .splash-subtitle {
+    color: #e0e7ff;
+}
+
+html[data-theme="dark"] .inventory-items {
+    background: rgba(30, 41, 59, 0.72);
+    border-color: rgba(148, 163, 184, 0.45);
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.45),
+        inset 0 2px 8px rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .intermission-container {
+    --bg-color: rgba(15, 23, 42, 0.97);
+    background: linear-gradient(165deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+}
+
+html[data-theme="dark"] .hub-link {
+    background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);
+}
+
+html[data-theme="dark"] .theme-select {
+    background: linear-gradient(135deg, #1d4ed8 0%, #172554 100%);
+}
+
+html[data-theme="dark"] .language-selector select {
+    background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%);
 }
 
 .hidden {

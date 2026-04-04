@@ -1,23 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="A colorful, forgiving drag-and-drop matching game designed for 3-year-olds">
+    <meta name="theme-color" content="#667eea" id="meta-theme-color">
     <title>🚙 Monster Truck Match</title>
+    <script>
+        (function () {
+            try {
+                var k = 'toddler-games-theme';
+                var legacy = 'puzzle-theme';
+                var pref = localStorage.getItem(k) || localStorage.getItem(legacy);
+                var effective;
+                if (pref === 'light') effective = 'light';
+                else if (pref === 'dark') effective = 'dark';
+                else {
+                    effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-theme', effective);
+                var meta = document.getElementById('meta-theme-color');
+                if (meta) meta.setAttribute('content', effective === 'dark' ? '#1e1b4b' : '#667eea');
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body role="application" aria-label="Monster Truck Match Game">
-    <!-- Language Selector -->
-    <div class="language-selector">
-        <label for="language-select" class="sr-only">Select Language</label>
-        <select id="language-select" aria-label="Choose game language">
-            <option value="en">🇬🇧 English</option>
-            <option value="fr">🇧🇪 Français</option>
-            <option value="es">🇪🇨 Español</option>
-        </select>
+    <div class="top-nav">
+        <a class="hub-link" href="../index.html" data-i18n="more-games">More games</a>
+        <div class="top-nav__right">
+            <label for="theme-select" class="sr-only">Theme</label>
+            <select
+                id="theme-select"
+                class="theme-select"
+                data-i18n-aria="theme-aria"
+                data-i18n-title="theme-title"
+                aria-label="Display theme"
+                title="Light, dark, or match your device"
+            >
+                <option value="system" data-i18n="theme-opt-system">🖥️ System</option>
+                <option value="light" data-i18n="theme-opt-light">☀️ Light</option>
+                <option value="dark" data-i18n="theme-opt-dark">🌙 Dark</option>
+            </select>
+            <div class="language-selector">
+                <label for="language-select" class="sr-only">Select Language</label>
+                <select id="language-select" aria-label="Choose game language">
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇧🇪 Français</option>
+                    <option value="es">🇪🇨 Español</option>
+                </select>
+            </div>
+        </div>
     </div>
 
     <!-- Splash Screen -->

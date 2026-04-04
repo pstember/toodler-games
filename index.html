@@ -1,22 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#1e3a5f">
+  <meta name="theme-color" content="#1e3a5f" id="meta-theme-color">
   <title>Toddler Games</title>
+  <script>
+    (function () {
+      try {
+        var k = 'toddler-games-theme';
+        var legacy = 'puzzle-theme';
+        var pref = localStorage.getItem(k) || localStorage.getItem(legacy);
+        var effective;
+        if (pref === 'light') effective = 'light';
+        else if (pref === 'dark') effective = 'dark';
+        else {
+          effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', effective);
+        var meta = document.getElementById('meta-theme-color');
+        if (meta) meta.setAttribute('content', effective === 'dark' ? '#0f172a' : '#1e3a5f');
+      } catch (e) {}
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
     html {
       min-height: 100%;
       min-height: 100dvh;
-      background: linear-gradient(165deg, #1e3a5f 0%, #0f766e 35%, #bfdbfe 65%, #ffedd5 100%);
       font-family: 'Fredoka', 'Segoe UI', system-ui, sans-serif;
       color: #1e3a5f;
+    }
+    html[data-theme="light"] {
+      background: linear-gradient(165deg, #1e3a5f 0%, #0f766e 35%, #bfdbfe 65%, #ffedd5 100%);
+    }
+    html[data-theme="dark"] {
+      background: linear-gradient(165deg, #0f172a 0%, #1e3a5f 40%, #172554 85%, #0f172a 100%);
     }
     body {
       min-height: 100dvh;
@@ -26,6 +60,29 @@
       justify-content: center;
       padding: 24px 16px;
       gap: 28px;
+      background: transparent;
+    }
+    .hub-top {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+    }
+    .hub-lang {
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 14px;
+      border: 3px solid #fff;
+      background: linear-gradient(180deg, #64748b 0%, #334155 100%);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(30, 58, 95, 0.2);
+    }
+    html[data-theme="dark"] .hub-lang {
+      border-color: rgba(148, 163, 184, 0.5);
+      background: linear-gradient(180deg, #94a3b8 0%, #475569 100%);
     }
     h1 {
       font-size: clamp(1.75rem, 5vw, 2.5rem);
@@ -33,6 +90,9 @@
       text-align: center;
       color: #fff;
       text-shadow: 0 2px 0 rgba(15, 23, 42, 0.25);
+    }
+    html[data-theme="dark"] h1 {
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
     }
     .grid {
       display: grid;
@@ -52,6 +112,11 @@
       transition: transform 0.1s ease, filter 0.15s ease;
       text-align: center;
     }
+    html[data-theme="dark"] a.card {
+      background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+      border-color: rgba(148, 163, 184, 0.35);
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
+    }
     a.card:active { transform: translateY(3px); }
     a.card:hover { filter: brightness(1.03); }
     .card__icon { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
@@ -61,28 +126,114 @@
       margin-bottom: 8px;
       color: #0f172a;
     }
+    html[data-theme="dark"] .card__title {
+      color: #f1f5f9;
+    }
     .card__desc {
       font-size: 0.95rem;
       color: #334e68;
       line-height: 1.35;
     }
+    html[data-theme="dark"] .card__desc {
+      color: #cbd5e1;
+    }
     .card--truck .card__title { color: #c2410c; }
+    html[data-theme="dark"] .card--truck .card__title { color: #fb923c; }
     .card--puzzle .card__title { color: #15803d; }
+    html[data-theme="dark"] .card--puzzle .card__title { color: #4ade80; }
   </style>
 </head>
 <body>
-  <h1>Pick a game</h1>
+  <div class="hub-top">
+    <label for="hub-lang" class="sr-only" id="hub-lang-label">Language</label>
+    <select id="hub-lang" class="hub-lang" aria-labelledby="hub-lang-label">
+      <option value="en">🇬🇧 English</option>
+      <option value="fr">🇧🇪 Français</option>
+      <option value="es">🇪🇨 Español</option>
+    </select>
+  </div>
+
+  <h1 id="hub-h1">Pick a game</h1>
   <nav class="grid" aria-label="Games">
     <a class="card card--truck" href="truck/">
       <div class="card__icon" aria-hidden="true">🚙</div>
-      <div class="card__title">Monster Truck Match</div>
-      <div class="card__desc">Drag shapes and colors onto the truck. Made for tiny fingers.</div>
+      <div class="card__title" id="hub-card-truck-title">Monster Truck Match</div>
+      <div class="card__desc" id="hub-card-truck-desc">Drag shapes and colors onto the truck. Made for tiny fingers.</div>
     </a>
     <a class="card card--puzzle" href="puzzle/">
       <div class="card__icon" aria-hidden="true">🧩</div>
-      <div class="card__title">Photo puzzle</div>
-      <div class="card__desc">Jigsaw puzzle with your own photos. Voronoi pieces and gentle hints.</div>
+      <div class="card__title" id="hub-card-puzzle-title">Photo puzzle</div>
+      <div class="card__desc" id="hub-card-puzzle-desc">Jigsaw puzzle with your own photos. Voronoi pieces and gentle hints.</div>
     </a>
   </nav>
+
+  <script>
+    (function () {
+      var LANG_KEY = 'toddler-games-language';
+      var LEGACY = 'monster-truck-language';
+      var HUB = {
+        en: {
+          title: 'Toddler Games',
+          h1: 'Pick a game',
+          langLabel: 'Language',
+          truckTitle: 'Monster Truck Match',
+          truckDesc: 'Drag shapes and colors onto the truck. Made for tiny fingers.',
+          puzzleTitle: 'Photo puzzle',
+          puzzleDesc: 'Jigsaw puzzle with your own photos. Voronoi pieces and gentle hints.'
+        },
+        fr: {
+          title: 'Jeux pour tout-petits',
+          h1: 'Choisis un jeu',
+          langLabel: 'Langue',
+          truckTitle: 'Match de Monster Truck',
+          truckDesc: 'Glisse formes et couleurs sur le camion. Pensé pour les petits doigts.',
+          puzzleTitle: 'Puzzle photo',
+          puzzleDesc: 'Puzzle avec tes photos. Pièces Voronoi et indices doux.'
+        },
+        es: {
+          title: 'Juegos para peques',
+          h1: 'Elige un juego',
+          langLabel: 'Idioma',
+          truckTitle: 'Monster Truck a emparejar',
+          truckDesc: 'Arrastra formas y colores al camión. Hecho para deditos.',
+          puzzleTitle: 'Puzzle de fotos',
+          puzzleDesc: 'Puzzle con tus fotos. Piezas Voronoi y pistas suaves.'
+        }
+      };
+      function resolveLang() {
+        try {
+          var c = localStorage.getItem(LANG_KEY);
+          if (c === 'en' || c === 'fr' || c === 'es') return c;
+          var l = localStorage.getItem(LEGACY);
+          if (l === 'en' || l === 'fr' || l === 'es') return l;
+        } catch (e) {}
+        return 'en';
+      }
+      function apply(lang) {
+        var t = HUB[lang] || HUB.en;
+        document.documentElement.lang = lang === 'en' ? 'en' : lang === 'es' ? 'es' : 'fr';
+        document.title = t.title;
+        document.getElementById('hub-h1').textContent = t.h1;
+        document.getElementById('hub-lang-label').textContent = t.langLabel;
+        document.getElementById('hub-card-truck-title').textContent = t.truckTitle;
+        document.getElementById('hub-card-truck-desc').textContent = t.truckDesc;
+        document.getElementById('hub-card-puzzle-title').textContent = t.puzzleTitle;
+        document.getElementById('hub-card-puzzle-desc').textContent = t.puzzleDesc;
+      }
+      var sel = document.getElementById('hub-lang');
+      var lang = resolveLang();
+      sel.value = lang;
+      apply(lang);
+      sel.addEventListener('change', function () {
+        var v = sel.value;
+        if (v !== 'en' && v !== 'fr' && v !== 'es') return;
+        try {
+          localStorage.setItem(LANG_KEY, v);
+          localStorage.setItem(LEGACY, v);
+        } catch (e) {}
+        apply(v);
+      });
+    })();
+  </script>
 </body>
 </html>

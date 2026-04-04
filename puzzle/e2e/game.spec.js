@@ -18,7 +18,7 @@ test.describe('Toddler jigsaw', () => {
 
     const hint = page.locator('#hint-overlay');
     await expect(hint).not.toHaveClass(/visible/);
-    await page.getByRole('button', { name: /Aide/i }).click();
+    await page.locator('#btn-hint').click();
     await expect(hint).toHaveClass(/visible/);
   });
 

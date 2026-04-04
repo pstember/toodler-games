@@ -6,9 +6,17 @@ import {
     BREAKPOINT_TABLET,
     BREAKPOINT_MOBILE,
     BRUSH_RADIUS,
+    CELEBRATION_DURATION,
     MUD_WASH_COMPLETION_THRESHOLD,
     PROGRESS_UPDATE_INTERVAL
 } from '../constants.js';
+import { translations, getCurrentLanguage } from '../translations.js';
+import {
+    createConfetti,
+    endIntermission,
+    hideCelebrationOverlay,
+    showCelebrationOverlay
+} from '../visual-effects.js';
 import { playSound } from '../utils.js';
 
 // Store mud wash listeners for cleanup
@@ -49,9 +57,10 @@ function setupMudWashCanvas(canvas) {
  */
 export function startMudWashGame() {
     const game = document.getElementById('mud-wash-game');
-    game.classList.remove('hidden');
+    game.classList.remove('hidden', 'mud-wash-celebrating');
 
     const canvas = document.getElementById('mud-canvas');
+    canvas.style.pointerEvents = '';
     const ctx = setupMudWashCanvas(canvas);
 
     let isDrawing = false;
@@ -102,12 +111,35 @@ export function startMudWashGame() {
             gameEnding = true;
             progressFill.style.width = `${MUD_WASH_COMPLETION_THRESHOLD}%`;
             progressText.textContent = `${MUD_WASH_COMPLETION_THRESHOLD}%`;
+
+            canvas.style.pointerEvents = 'none';
+            game.classList.add('mud-wash-celebrating');
+
+            playSound('levelComplete');
+            createConfetti();
+
+            const overlayText = document.querySelector('#celebration-overlay .celebration-text');
+            const lang = getCurrentLanguage();
+            const celebrationMsg =
+                translations[lang]?.['mud-wash-celebration'] ||
+                translations.en['mud-wash-celebration'];
+            if (overlayText && celebrationMsg) {
+                overlayText.textContent = celebrationMsg;
+            }
+
+            showCelebrationOverlay();
+
             setTimeout(() => {
-                // Dynamic import to avoid circular dependency
-                import('../visual-effects.js').then(({ endIntermission }) => {
-                    endIntermission();
-                });
-            }, 500);
+                hideCelebrationOverlay();
+                game.classList.remove('mud-wash-celebrating');
+                if (overlayText) {
+                    overlayText.dataset.i18n = 'amazing';
+                    const amazing =
+                        translations[lang]?.amazing || translations.en.amazing;
+                    overlayText.textContent = amazing;
+                }
+                endIntermission();
+            }, CELEBRATION_DURATION);
         }
     }
 

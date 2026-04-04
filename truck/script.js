@@ -7,6 +7,7 @@ import { gameState } from './src/state.js';
 
 // Import translation system
 import { setLanguage, getCurrentLanguage } from './src/translations.js';
+import { initThemeSelect } from './src/theme.js';
 
 // Import utility functions
 import { playSound } from './src/utils.js';
@@ -60,6 +61,8 @@ if (typeof window !== 'undefined') {
 // ===================================
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    initThemeSelect();
 
     // Initialize language
     const currentLanguage = getCurrentLanguage();

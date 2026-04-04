@@ -2,6 +2,30 @@
 // TRANSLATIONS MODULE
 // ===================================
 
+/** Shared across toddler games; legacy key kept for migration. */
+export const LANGUAGE_STORAGE_KEY = 'toddler-games-language';
+const LEGACY_LANGUAGE_STORAGE_KEY = 'monster-truck-language';
+
+/**
+ * Resolve active language: canonical key, then legacy truck-only key, then default.
+ * @returns {'en'|'fr'|'es'}
+ */
+export function resolveStoredLanguage() {
+    try {
+        const canonical = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+        if (canonical === 'en' || canonical === 'fr' || canonical === 'es') {
+            return canonical;
+        }
+        const legacy = localStorage.getItem(LEGACY_LANGUAGE_STORAGE_KEY);
+        if (legacy === 'en' || legacy === 'fr' || legacy === 'es') {
+            return legacy;
+        }
+    } catch {
+        /* ignore */
+    }
+    return 'en';
+}
+
 export const translations = {
     en: {
         'splash-title': '🚙 Monster Truck Match 🚙',
@@ -11,6 +35,7 @@ export const translations = {
         'amazing': '🎉 Amazing! 🎉',
         'mud-wash-title': '🧽 Wash the Truck! 🧽',
         'mud-wash-instructions': 'Swipe to clean off the mud!',
+        'mud-wash-celebration': '🌟 Sparkling clean! You did it! 🌟',
         'cleaned': 'Cleaned:',
         'sticker-shop-title': '✨ Decorate Your Truck! ✨',
         'sticker-shop-instructions': 'Drag stickers onto your truck, then click DONE!',
@@ -20,7 +45,13 @@ export const translations = {
         'jump': 'JUMP!',
         'bubble-wrap-title': '🎈 POP THE BUBBLES! 🎈',
         'bubble-wrap-instructions': 'Tap all the bubbles to pop them!',
-        'popped': 'popped'
+        'popped': 'popped',
+        'more-games': 'More games',
+        'theme-aria': 'Display theme',
+        'theme-title': 'Light, dark, or match your device',
+        'theme-opt-system': '🖥️ System',
+        'theme-opt-light': '☀️ Light',
+        'theme-opt-dark': '🌙 Dark'
     },
     fr: {
         'splash-title': '🚙 Match de Monster Truck 🚙',
@@ -30,6 +61,7 @@ export const translations = {
         'amazing': '🎉 Incroyable ! 🎉',
         'mud-wash-title': '🧽 Lave le Camion ! 🧽',
         'mud-wash-instructions': 'Glisse pour nettoyer la boue !',
+        'mud-wash-celebration': '🌟 Tout brillant ! Bravo ! 🌟',
         'cleaned': 'Nettoyé :',
         'sticker-shop-title': '✨ Décore Ton Camion ! ✨',
         'sticker-shop-instructions': 'Glisse les autocollants sur ton camion, puis clique sur FINI !',
@@ -39,7 +71,13 @@ export const translations = {
         'jump': 'SAUTER !',
         'bubble-wrap-title': '🎈 ÉCLATE LES BULLES ! 🎈',
         'bubble-wrap-instructions': 'Tape sur toutes les bulles pour les éclater !',
-        'popped': 'éclatées'
+        'popped': 'éclatées',
+        'more-games': 'Autres jeux',
+        'theme-aria': 'Thème d’affichage',
+        'theme-title': 'Clair, sombre ou comme l’appareil',
+        'theme-opt-system': '🖥️ Système',
+        'theme-opt-light': '☀️ Clair',
+        'theme-opt-dark': '🌙 Sombre'
     },
     es: {
         'splash-title': '🚙 Empareja el Monster Truck 🚙',
@@ -49,6 +87,7 @@ export const translations = {
         'amazing': '🎉 ¡Increíble! 🎉',
         'mud-wash-title': '🧽 ¡Lava el Camión! 🧽',
         'mud-wash-instructions': '¡Desliza para limpiar el lodo!',
+        'mud-wash-celebration': '🌟 ¡Reluciente! ¡Lo lograste! 🌟',
         'cleaned': 'Limpiado:',
         'sticker-shop-title': '✨ ¡Decora Tu Camión! ✨',
         'sticker-shop-instructions': '¡Arrastra pegatinas a tu camión y luego haz clic en LISTO!',
@@ -58,11 +97,17 @@ export const translations = {
         'jump': '¡SALTAR!',
         'bubble-wrap-title': '🎈 ¡REVIENTA LAS BURBUJAS! 🎈',
         'bubble-wrap-instructions': '¡Toca todas las burbujas para reventarlas!',
-        'popped': 'reventadas'
+        'popped': 'reventadas',
+        'more-games': 'Más juegos',
+        'theme-aria': 'Tema de pantalla',
+        'theme-title': 'Claro, oscuro o como el dispositivo',
+        'theme-opt-system': '🖥️ Sistema',
+        'theme-opt-light': '☀️ Claro',
+        'theme-opt-dark': '🌙 Oscuro'
     }
 };
 
-let currentLanguage = localStorage.getItem('monster-truck-language') || 'en';
+let currentLanguage = resolveStoredLanguage();
 
 export function getCurrentLanguage() {
     return currentLanguage;
@@ -70,13 +115,33 @@ export function getCurrentLanguage() {
 
 export function setLanguage(lang) {
     currentLanguage = lang;
-    localStorage.setItem('monster-truck-language', lang);
+    try {
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+        localStorage.setItem(LEGACY_LANGUAGE_STORAGE_KEY, lang);
+    } catch {
+        /* ignore */
+    }
 
-    // Update all elements with data-i18n attribute
-    document.querySelectorAll('[data-i18n]').forEach(element => {
+    const table = translations[lang] || translations.en;
+
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
         const key = element.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-            element.textContent = translations[lang][key];
+        if (key && table[key]) {
+            element.textContent = table[key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach((element) => {
+        const key = element.getAttribute('data-i18n-title');
+        if (key && table[key]) {
+            element.setAttribute('title', table[key]);
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-aria]').forEach((element) => {
+        const key = element.getAttribute('data-i18n-aria');
+        if (key && table[key]) {
+            element.setAttribute('aria-label', table[key]);
         }
     });
 }

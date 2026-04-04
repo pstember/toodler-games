@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#1e3a5f" id="meta-theme-color">
-  <title>Puzzle pour Enfants</title>
+  <title>Photo puzzle</title>
   <script>
     (function () {
       try {
-        var k = 'puzzle-theme';
-        var pref = localStorage.getItem(k);
+        var k = 'toddler-games-theme';
+        var legacy = 'puzzle-theme';
+        var pref = localStorage.getItem(k) || localStorage.getItem(legacy);
         var effective;
         if (pref === 'light') effective = 'light';
         else if (pref === 'dark') effective = 'dark';
@@ -146,7 +147,8 @@
     }
 
     #difficulty-select.btn:focus-visible,
-    #theme-select.btn:focus-visible {
+    #theme-select.btn:focus-visible,
+    #language-select.btn:focus-visible {
       outline-offset: 2px;
     }
 
@@ -229,6 +231,53 @@
       color: var(--play-ink);
       background: var(--play-card);
       font-weight: 600;
+    }
+
+    #language-select.btn {
+      appearance: none;
+      cursor: pointer;
+      color: #fff;
+      padding-right: 38px;
+      background-image:
+        linear-gradient(180deg, #64748b 0%, #334155 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-position: 0 0, right 12px center;
+      background-repeat: no-repeat, no-repeat;
+      background-size: auto, 12px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.22);
+    }
+
+    #language-select option {
+      color: var(--play-ink);
+      background: var(--play-card);
+      font-weight: 600;
+    }
+
+    .hub-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 10px 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--play-ink);
+      background: rgba(255, 255, 255, 0.75);
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      box-shadow: var(--play-shadow-soft), var(--play-shadow-inset);
+      transition: transform 0.08s ease, filter 0.12s ease;
+    }
+
+    .hub-link:active {
+      transform: translateY(2px);
+    }
+
+    .hub-link:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+      box-shadow: var(--play-shadow), var(--play-shadow-inset), 0 0 0 3px var(--play-focus-ring);
     }
 
     #play-area {
@@ -829,9 +878,16 @@
     }
 
     html[data-theme="dark"] #difficulty-select option,
-    html[data-theme="dark"] #theme-select option {
+    html[data-theme="dark"] #theme-select option,
+    html[data-theme="dark"] #language-select option {
       background: #1e293b;
       color: var(--play-ink);
+    }
+
+    html[data-theme="dark"] .hub-link {
+      background: rgba(30, 41, 59, 0.65);
+      border-color: rgba(51, 65, 85, 0.9);
+      color: #e2e8f0;
     }
 
     /* Dark mode: slightly brighter tops so buttons stay legible on the dark menu bar */
@@ -862,65 +918,84 @@
         linear-gradient(180deg, #3b82f6 0%, #1e3a8a 100%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
     }
+
+    html[data-theme="dark"] #language-select.btn {
+      background-image:
+        linear-gradient(180deg, #94a3b8 0%, #475569 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    }
   </style>
 </head>
 <body>
   <!-- L’appli doit être servie par HTTP (npm run dev ou npm run preview). Ouvrir ce fichier en file:// ne charge pas les modules. -->
   <div id="app-container">
     <div id="menu-bar">
-      <button type="button" class="btn btn-primary" id="btn-photo">
-        📸 Choisir une photo
+      <a class="hub-link" href="../index.html" data-i18n="more-games">More games</a>
+
+      <select id="language-select" class="btn" data-i18n-aria="language-select-aria" aria-label="Game language">
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇧🇪 Français</option>
+        <option value="es">🇪🇨 Español</option>
+      </select>
+
+      <button type="button" class="btn btn-primary" id="btn-photo" data-i18n="btn-photo">
+        📸 Choose a photo
       </button>
 
       <select
         class="btn"
         id="difficulty-select"
-        aria-label="Difficulté du puzzle"
-        title="Taille de la grille : plus il y a de cases, plus c’est difficile."
+        data-i18n-aria="difficulty-aria"
+        data-i18n-title="difficulty-title"
+        aria-label="Puzzle difficulty"
+        title="Grid size: more cells means harder."
       >
-        <option value="0">Débutant (3×3)</option>
-        <option value="1">Intermédiaire (4×3)</option>
-        <option value="2">Avancé (4×4)</option>
-        <option value="3">Défi (5×4)</option>
-        <option value="4">Expert (8×6)</option>
+        <option value="0" data-i18n="difficulty-opt-0">Beginner (3×3)</option>
+        <option value="1" data-i18n="difficulty-opt-1">Intermediate (4×3)</option>
+        <option value="2" data-i18n="difficulty-opt-2">Advanced (4×4)</option>
+        <option value="3" data-i18n="difficulty-opt-3">Challenge (5×4)</option>
+        <option value="4" data-i18n="difficulty-opt-4">Expert (8×6)</option>
       </select>
 
-      <button type="button" class="btn btn-info" id="btn-hint">
-        💡 Aide
+      <button type="button" class="btn btn-info" id="btn-hint" data-i18n="btn-hint">
+        💡 Hint
       </button>
 
       <button
         type="button"
         class="btn btn-warning"
         id="btn-numbers"
-        title="Affiche un numéro sur chaque pièce (et sur chaque case vide : la pièce qui doit s’y placer)."
+        data-i18n="btn-numbers"
+        data-i18n-title="btn-numbers-title"
+        title="Shows a number on each piece (and on each empty slot: which piece belongs there)."
       >
-        🔢 Numéros
+        🔢 Numbers
       </button>
 
       <select
         class="btn"
         id="theme-select"
-        aria-label="Thème d’affichage"
-        title="Clair, sombre ou comme le réglage du téléphone ou de la tablette"
+        data-i18n-aria="theme-aria"
+        data-i18n-title="theme-title"
+        aria-label="Display theme"
+        title="Light, dark, or match your phone or tablet"
       >
-        <option value="system">🖥️ Système</option>
-        <option value="light">☀️ Clair</option>
-        <option value="dark">🌙 Sombre</option>
+        <option value="system" data-i18n="theme-opt-system">🖥️ System</option>
+        <option value="light" data-i18n="theme-opt-light">☀️ Light</option>
+        <option value="dark" data-i18n="theme-opt-dark">🌙 Dark</option>
       </select>
     </div>
 
     <details id="tongue-panel" class="tongue-panel">
-      <summary class="tongue-panel__summary">Réglages des langues (forme des pièces)</summary>
-      <p class="tongue-panel__hint">
-        Déplacez les curseurs pour tester les paramètres. La grille Voronoi ne change pas tant que vous n’appuyez pas sur « Nouvelle graine ».
-        Notez les valeurs qui vous conviennent pour les reporter dans le code.
+      <summary class="tongue-panel__summary" data-i18n="tongue-panel-summary">Tab settings (piece shape)</summary>
+      <p class="tongue-panel__hint" data-i18n="tongue-panel-hint">
+        Move the sliders to tune parameters. The Voronoi grid does not change until you press “New seed”. Note values you like to copy into code.
       </p>
-      <div class="tongue-panel__grid" id="tongue-sliders-root" aria-label="Paramètres des langues"></div>
+      <div class="tongue-panel__grid" id="tongue-sliders-root" data-i18n-aria="tongue-panel-sliders-aria" aria-label="Jigsaw tab parameters"></div>
       <div class="tongue-panel__actions">
-        <button type="button" class="btn btn-info" id="btn-tongue-reset">Réinitialiser réglages</button>
-        <button type="button" class="btn btn-warning" id="btn-tongue-new-seed">Nouvelle graine</button>
-        <button type="button" class="btn btn-success" id="btn-tongue-copy">Copier JSON</button>
+        <button type="button" class="btn btn-info" id="btn-tongue-reset" data-i18n="tongue-reset">Reset settings</button>
+        <button type="button" class="btn btn-warning" id="btn-tongue-new-seed" data-i18n="tongue-new-seed">New seed</button>
+        <button type="button" class="btn btn-success" id="btn-tongue-copy" data-i18n="tongue-copy">Copy JSON</button>
       </div>
     </details>
 
@@ -930,20 +1005,20 @@
           <div id="puzzle-container">
             <div id="puzzle-grid"></div>
             <div id="hint-overlay"></div>
-            <div class="loading" id="loading">Chargement…</div>
+            <div class="loading" id="loading" data-i18n="loading">Loading…</div>
           </div>
         </div>
-        <div id="piece-tray" data-testid="piece-tray" aria-label="Pièces du puzzle"></div>
+        <div id="piece-tray" data-testid="piece-tray" data-i18n-aria="piece-tray-aria" aria-label="Puzzle pieces"></div>
       </div>
     </div>
 
-    <input type="file" id="file-input" accept="image/*" hidden>
+    <input type="file" id="file-input" accept="image/*" hidden data-i18n-aria="file-input-aria" aria-label="Choose image file">
   </div>
 
   <div id="win-overlay">
-    <div class="win-message">Bravo ! 🎉</div>
-    <button type="button" class="btn btn-success" id="btn-replay" style="font-size: 24px; padding: 16px 32px;">
-      🔄 Rejouer
+    <div class="win-message" data-i18n="win-message">Well done! 🎉</div>
+    <button type="button" class="btn btn-success btn--win" id="btn-replay" data-i18n="btn-replay" style="font-size: 24px; padding: 16px 32px;">
+      🔄 Play again
     </button>
   </div>
 

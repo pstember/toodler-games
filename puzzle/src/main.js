@@ -6,19 +6,21 @@ import {
   resetTongueParams,
   DEFAULT_TONGUE_PARAMS,
 } from './tongue-params.js';
+import { setLanguage, resolveStoredLanguage, tCurrent } from './translations.js';
 
 const LEVELS = [
-  { name: 'Débutant', cols: 3, rows: 3 },
-  { name: 'Intermédiaire', cols: 4, rows: 3 },
-  { name: 'Avancé', cols: 4, rows: 4 },
-  { name: 'Défi', cols: 5, rows: 4 },
-  { name: 'Expert', cols: 8, rows: 6 },
+  { cols: 3, rows: 3 },
+  { cols: 4, rows: 3 },
+  { cols: 4, rows: 4 },
+  { cols: 5, rows: 4 },
+  { cols: 8, rows: 6 },
 ];
 
 const DEFAULT_IMAGE_URL =
   'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&fit=crop';
 
-const THEME_STORAGE_KEY = 'puzzle-theme';
+const THEME_STORAGE_KEY = 'toddler-games-theme';
+const LEGACY_THEME_STORAGE_KEY = 'puzzle-theme';
 
 /** @param {'light' | 'dark' | 'system'} pref */
 function resolveEffectiveTheme(pref) {
@@ -37,7 +39,7 @@ function applyEffectiveTheme(effective) {
 /** @returns {'light' | 'dark' | 'system'} */
 function getThemePreference() {
   try {
-    const v = localStorage.getItem(THEME_STORAGE_KEY);
+    const v = localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem(LEGACY_THEME_STORAGE_KEY);
     if (v === 'light' || v === 'dark' || v === 'system') return v;
   } catch {
     /* ignore */
@@ -60,9 +62,9 @@ function initThemeSelect() {
   mql.addEventListener('change', onSystemColorSchemeChange);
 
   sel?.addEventListener('change', (e) => {
-    const t = e.target;
-    if (!(t instanceof HTMLSelectElement)) return;
-    const v = t.value;
+    const target = e.target;
+    if (!(target instanceof HTMLSelectElement)) return;
+    const v = target.value;
     if (v !== 'light' && v !== 'dark' && v !== 'system') return;
     try {
       localStorage.setItem(THEME_STORAGE_KEY, v);
@@ -70,6 +72,21 @@ function initThemeSelect() {
       /* ignore */
     }
     applyEffectiveTheme(resolveEffectiveTheme(v));
+  });
+}
+
+function initLanguageSelect() {
+  const lang = resolveStoredLanguage();
+  const sel = document.getElementById('language-select');
+  if (sel) sel.value = lang;
+  setLanguage(lang);
+  sel?.addEventListener('change', (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLSelectElement)) return;
+    const v = target.value;
+    if (v === 'en' || v === 'fr' || v === 'es') {
+      setLanguage(v);
+    }
   });
 }
 
@@ -799,7 +816,12 @@ function cheatSolve() {
 }
 
 // --- UI wiring ---
+initLanguageSelect();
 initThemeSelect();
+
+document.addEventListener('puzzle-lang-updated', () => {
+  updateTongueSliderLabels();
+});
 
 document.getElementById('btn-photo').addEventListener('click', () => {
   document.getElementById('file-input').click();
@@ -854,21 +876,29 @@ function formatTongueVal(_key, v) {
   return String(Math.round(v * 10000) / 10000);
 }
 
+/** @type {Array<[string, string, number, number, number]>} */
 const TONGUE_SLIDER_DEFS = [
-  ['globalBulge', 'Bulge global (×)', 0.35, 3, 0.05],
-  ['amplitudeMax', 'Amplitude max', 0.4, 1.75, 0.02],
-  ['amplitudeMin', 'Amplitude min', 0.12, 0.7, 0.02],
-  ['widthMax', 'Largeur max', 0.32, 1.75, 0.02],
-  ['widthMin', 'Largeur min', 0.18, 0.85, 0.02],
-  ['edgeVertexPad', 'Marge aux coins', 0.07, 0.24, 0.005],
-  ['tabSpanMin', 'Longueur langue min', 0.2, 0.58, 0.01],
-  ['tabSpanMax', 'Longueur langue max', 0.35, 0.72, 0.01],
-  ['cornerDamp2', '2ᵉ arête au sommet', 0.45, 1, 0.02],
-  ['cornerDamp3', '3ᵉ+ arête au sommet', 0.32, 1, 0.02],
-  ['shortChordRef', 'Réf. corde courte (↑ = langues plus grandes)', 0.035, 0.14, 0.005],
-  ['refLen', 'refLen (échelle longueur)', 0.06, 0.2, 0.005],
-  ['minChordLength', 'Corde min. pour courbe', 0.018, 0.12, 0.002],
+  ['globalBulge', 'tongue-slider-globalBulge', 0.35, 3, 0.05],
+  ['amplitudeMax', 'tongue-slider-amplitudeMax', 0.4, 1.75, 0.02],
+  ['amplitudeMin', 'tongue-slider-amplitudeMin', 0.12, 0.7, 0.02],
+  ['widthMax', 'tongue-slider-widthMax', 0.32, 1.75, 0.02],
+  ['widthMin', 'tongue-slider-widthMin', 0.18, 0.85, 0.02],
+  ['edgeVertexPad', 'tongue-slider-edgeVertexPad', 0.07, 0.24, 0.005],
+  ['tabSpanMin', 'tongue-slider-tabSpanMin', 0.2, 0.58, 0.01],
+  ['tabSpanMax', 'tongue-slider-tabSpanMax', 0.35, 0.72, 0.01],
+  ['cornerDamp2', 'tongue-slider-cornerDamp2', 0.45, 1, 0.02],
+  ['cornerDamp3', 'tongue-slider-cornerDamp3', 0.32, 1, 0.02],
+  ['shortChordRef', 'tongue-slider-shortChordRef', 0.035, 0.14, 0.005],
+  ['refLen', 'tongue-slider-refLen', 0.06, 0.2, 0.005],
+  ['minChordLength', 'tongue-slider-minChordLength', 0.018, 0.12, 0.002],
 ];
+
+function updateTongueSliderLabels() {
+  for (const [key, i18nKey] of TONGUE_SLIDER_DEFS) {
+    const lab = document.querySelector(`label[for="tongue-${key}"]`);
+    if (lab) lab.textContent = tCurrent(i18nKey);
+  }
+}
 
 function clampTongueParams() {
   const p = getTongueParams();
@@ -894,13 +924,13 @@ function initTongueTuning() {
   if (!root) return;
   const params = getTongueParams();
   root.replaceChildren();
-  for (const [key, label, min, max, step] of TONGUE_SLIDER_DEFS) {
+  for (const [key, i18nKey, min, max, step] of TONGUE_SLIDER_DEFS) {
     const row = document.createElement('div');
     row.className = 'tongue-slider-row';
     const val = params[key] ?? DEFAULT_TONGUE_PARAMS[key];
     const lab = document.createElement('label');
     lab.className = 'tongue-slider-row__label';
-    lab.textContent = label;
+    lab.textContent = tCurrent(i18nKey);
     lab.htmlFor = `tongue-${key}`;
     const input = document.createElement('input');
     input.type = 'range';
