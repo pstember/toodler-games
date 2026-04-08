@@ -7,9 +7,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: [['html'], ['list']],
+  timeout: 30000, // 30 second timeout per test
+  globalTimeout: 300000, // 5 minute global timeout
 
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:3000/truck',
     trace: 'on-first-retry',
     headless: true,
     screenshot: 'only-on-failure',
@@ -18,9 +20,9 @@ export default defineConfig({
     javaScriptEnabled: true,
   },
 
-  // Start local server before tests
+  // Start local server before tests (from parent directory to access shared/)
   webServer: {
-    command: 'npx serve . -l 3000',
+    command: 'cd .. && python3 -m http.server 3000',
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
