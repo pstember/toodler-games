@@ -26,7 +26,8 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared-design-tokens.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .sr-only {
@@ -43,14 +44,14 @@
     html {
       min-height: 100%;
       min-height: 100dvh;
-      font-family: 'Fredoka', 'Segoe UI', system-ui, sans-serif;
-      color: #1e3a5f;
+      font-family: var(--font-family);
+      color: var(--text-primary);
     }
     html[data-theme="light"] {
-      background: linear-gradient(165deg, #1e3a5f 0%, #0f766e 35%, #bfdbfe 65%, #ffedd5 100%);
+      background: var(--bg-primary);
     }
     html[data-theme="dark"] {
-      background: linear-gradient(165deg, #0f172a 0%, #1e3a5f 40%, #172554 85%, #0f172a 100%);
+      background: var(--bg-primary);
     }
     body {
       min-height: 100dvh;
@@ -76,31 +77,49 @@
     }
     .hub-theme,
     .hub-lang {
-      padding: 10px 14px;
+      padding: var(--space-sm) 14px;
       font-size: 16px;
-      font-weight: 600;
-      font-family: inherit;
-      border-radius: 14px;
-      border: 3px solid #fff;
-      background: linear-gradient(180deg, #64748b 0%, #334155 100%);
-      color: #fff;
+      font-weight: 700;
+      font-family: var(--font-family);
+      border-radius: var(--radius-md);
+      border: 3px solid var(--border-medium);
       cursor: pointer;
-      box-shadow: 0 4px 0 rgba(30, 58, 95, 0.2);
+      box-shadow: var(--shadow-toy), var(--shadow-inset);
+      transition: all 0.2s ease;
+      color: var(--text-inverse);
+      text-shadow:
+        2px 2px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000;
     }
-    html[data-theme="dark"] .hub-theme,
-    html[data-theme="dark"] .hub-lang {
-      border-color: rgba(148, 163, 184, 0.5);
-      background: linear-gradient(180deg, #94a3b8 0%, #475569 100%);
+    .hub-theme {
+      background: var(--btn-secondary);
+    }
+    .hub-lang {
+      background: var(--btn-accent);
+    }
+    .hub-theme:hover,
+    .hub-lang:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-hover), var(--shadow-inset);
+    }
+    .hub-theme:active,
+    .hub-lang:active {
+      transform: scale(0.96);
+      box-shadow: var(--shadow-toy-soft), var(--shadow-inset);
     }
     h1 {
       font-size: clamp(1.75rem, 5vw, 2.5rem);
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
-      color: #fff;
-      text-shadow: 0 2px 0 rgba(15, 23, 42, 0.25);
-    }
-    html[data-theme="dark"] h1 {
-      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+      color: var(--text-inverse);
+      text-shadow:
+        2px 2px 0px #000000,
+        -1px -1px 0px #000000,
+        1px -1px 0px #000000,
+        -1px 1px 0px #000000;
+      font-family: var(--font-family);
     }
     .grid {
       display: grid;
@@ -112,43 +131,45 @@
       display: block;
       text-decoration: none;
       color: inherit;
-      background: linear-gradient(180deg, #fff 0%, #e0f2fe 100%);
-      border-radius: 24px;
-      padding: 28px 24px;
-      border: 4px solid #fff;
-      box-shadow: 0 8px 0 rgba(30, 58, 95, 0.15), 0 0 0 2px rgba(30, 64, 175, 0.12);
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px var(--space-lg);
+      border: 4px solid var(--card-border);
+      box-shadow: var(--card-shadow);
       transition: transform 0.1s ease, filter 0.15s ease;
       text-align: center;
     }
-    html[data-theme="dark"] a.card {
-      background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
-      border-color: rgba(148, 163, 184, 0.35);
-      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
+    a.card:active {
+      transform: translateY(3px);
+      box-shadow: var(--shadow-toy-soft);
     }
-    a.card:active { transform: translateY(3px); }
-    a.card:hover { filter: brightness(1.03); }
-    .card__icon { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
+    a.card:hover {
+      filter: brightness(1.03);
+      transform: scale(1.02);
+    }
+    .card__icon { font-size: 3rem; line-height: 1; margin-bottom: var(--space-sm); }
     .card__title {
       font-size: 1.35rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #0f172a;
-    }
-    html[data-theme="dark"] .card__title {
-      color: #f1f5f9;
+      font-weight: 800;
+      margin-bottom: var(--space-xs);
+      color: var(--text-primary);
+      font-family: var(--font-family);
     }
     .card__desc {
       font-size: 0.95rem;
-      color: #334e68;
+      color: var(--text-secondary);
       line-height: 1.35;
-    }
-    html[data-theme="dark"] .card__desc {
-      color: #cbd5e1;
+      font-family: var(--font-family);
     }
     .card--truck .card__title { color: #c2410c; }
     html[data-theme="dark"] .card--truck .card__title { color: #fb923c; }
     .card--puzzle .card__title { color: #15803d; }
     html[data-theme="dark"] .card--puzzle .card__title { color: #4ade80; }
+
+    /* Grid spacing */
+    .grid {
+      gap: var(--space-lg);
+    }
   </style>
 </head>
 <body>

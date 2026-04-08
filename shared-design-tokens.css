@@ -1,0 +1,246 @@
+/* ===================================
+   TODDLER GAMES - UNIFIED DESIGN SYSTEM
+   =================================== */
+
+:root {
+  /* === TYPOGRAPHY === */
+  --font-family: 'Fredoka', 'Segoe UI', system-ui, sans-serif;
+
+  /* === SPACING RHYTHM === */
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* === BORDER RADIUS === */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 30px;
+
+  /* === SHADOWS - Toy-like depth === */
+  --shadow-toy: 0 8px 0 rgba(30, 58, 95, 0.12);
+  --shadow-toy-soft: 0 4px 0 rgba(30, 58, 95, 0.08);
+  --shadow-hover: 0 10px 0 rgba(30, 58, 95, 0.15);
+  --shadow-inset: inset 0 3px 0 rgba(255, 255, 255, 0.5);
+  --shadow-lifted: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* === LIGHT THEME === */
+html[data-theme="light"] {
+  /* Background - Warm sky gradient */
+  --bg-primary: linear-gradient(165deg, #1e3a5f 0%, #0f766e 35%, #bfdbfe 65%, #ffedd5 100%);
+  --bg-overlay: rgba(255, 255, 255, 0.95);
+
+  /* Text colors */
+  --text-primary: #1e3a5f;
+  --text-secondary: #334e68;
+  --text-inverse: #ffffff;
+
+  /* Button gradients */
+  --btn-primary: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --btn-secondary: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+  --btn-accent: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  --btn-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+
+  /* Splash screen gradient */
+  --splash-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --splash-title-color: #FFD700;
+  --splash-subtitle-color: #ffffff;
+
+  /* Card backgrounds */
+  --card-bg: linear-gradient(180deg, #fff 0%, #e0f2fe 100%);
+  --card-border: #ffffff;
+  --card-shadow: 0 8px 0 rgba(30, 58, 95, 0.15), 0 0 0 2px rgba(30, 64, 175, 0.12);
+
+  /* UI elements */
+  --border-light: rgba(255, 255, 255, 0.8);
+  --border-medium: rgba(255, 255, 255, 1);
+}
+
+/* === DARK THEME === */
+html[data-theme="dark"] {
+  /* Background - Deep night gradient */
+  --bg-primary: linear-gradient(165deg, #0f172a 0%, #1e3a5f 40%, #172554 85%, #0f172a 100%);
+  --bg-overlay: rgba(15, 23, 42, 0.95);
+
+  /* Text colors */
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-inverse: #0f172a;
+
+  /* Button gradients - slightly muted for dark mode */
+  --btn-primary: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  --btn-secondary: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  --btn-accent: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  --btn-success: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+
+  /* Splash screen gradient - softer for dark */
+  --splash-bg: linear-gradient(135deg, #4c51bf 0%, #5a3d7c 100%);
+  --splash-title-color: #FDE047;
+  --splash-subtitle-color: #e0e7ff;
+
+  /* Card backgrounds */
+  --card-bg: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+  --card-border: rgba(148, 163, 184, 0.35);
+  --card-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
+
+  /* UI elements */
+  --border-light: rgba(148, 163, 184, 0.3);
+  --border-medium: rgba(148, 163, 184, 0.5);
+
+  /* Dark theme shadows */
+  --shadow-toy: 0 8px 0 rgba(0, 0, 0, 0.3);
+  --shadow-toy-soft: 0 4px 0 rgba(0, 0, 0, 0.2);
+  --shadow-hover: 0 10px 0 rgba(0, 0, 0, 0.4);
+  --shadow-lifted: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* === UNIFIED BUTTON SYSTEM === */
+.game-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  color: var(--text-inverse);
+  border: 3px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-toy), var(--shadow-inset);
+  text-shadow:
+    2px 2px 0px #000000,
+    -1px -1px 0px #000000,
+    1px -1px 0px #000000,
+    -1px 1px 0px #000000;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.game-btn:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-hover), var(--shadow-inset);
+}
+
+.game-btn:active {
+  transform: scale(0.96);
+  box-shadow: var(--shadow-toy-soft), var(--shadow-inset);
+}
+
+.game-btn--primary { background: var(--btn-primary); }
+.game-btn--secondary { background: var(--btn-secondary); }
+.game-btn--accent { background: var(--btn-accent); }
+.game-btn--success { background: var(--btn-success); }
+
+/* === UNIFIED SPLASH SCREEN === */
+.unified-splash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--splash-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+  animation: fadeIn 0.3s ease;
+}
+
+.unified-splash.hidden {
+  display: none;
+}
+
+.unified-splash__content {
+  text-align: center;
+  padding: var(--space-2xl);
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.unified-splash__title {
+  font-size: clamp(36px, 8vw, 64px);
+  font-weight: 800;
+  color: var(--splash-title-color);
+  text-shadow:
+    3px 3px 0px #000000,
+    -1px -1px 0px #000000,
+    1px -1px 0px #000000,
+    -1px 1px 0px #000000,
+    0 0 20px rgba(255, 215, 0, 0.6);
+  margin-bottom: var(--space-lg);
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+  animation: gentleBounce 2s ease-in-out infinite;
+  line-height: 1.2;
+}
+
+.unified-splash__subtitle {
+  font-size: clamp(20px, 4vw, 32px);
+  font-weight: 700;
+  color: var(--splash-subtitle-color);
+  text-shadow:
+    2px 2px 0px #000000,
+    -1px -1px 0px #000000,
+    1px -1px 0px #000000,
+    -1px 1px 0px #000000;
+  margin-bottom: var(--space-2xl);
+  line-height: 1.3;
+}
+
+.unified-splash__icon {
+  width: 300px;
+  height: auto;
+  margin: 0 auto var(--space-2xl) auto;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+  animation: iconFloat 2s ease-in-out infinite;
+}
+
+.unified-splash__button {
+  min-width: 300px;
+  max-width: 400px;
+  min-height: 100px;
+  padding: var(--space-lg) var(--space-xl);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  border-width: 6px;
+  border-radius: var(--radius-xl);
+}
+
+/* === ANIMATIONS === */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gentleBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(3deg); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+  .game-btn {
+    padding: 10px 16px;
+    font-size: 16px;
+  }
+
+  .unified-splash__icon {
+    width: 240px;
+  }
+}
