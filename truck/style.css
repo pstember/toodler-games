@@ -203,6 +203,7 @@ body::after {
 
 .theme-select {
     background: var(--btn-secondary);
+    padding-right: 40px; /* Extra space for dropdown arrow */
 }
 
 .theme-select option {
@@ -222,6 +223,7 @@ html[data-theme="dark"] .theme-select option {
 
 .language-selector select {
     background: var(--btn-accent);
+    padding-right: 40px; /* Extra space for dropdown arrow */
 }
 
 .language-selector select option {
