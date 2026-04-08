@@ -2,29 +2,15 @@
 // TRANSLATIONS MODULE
 // ===================================
 
-/** Shared across toddler games; legacy key kept for migration. */
-export const LANGUAGE_STORAGE_KEY = 'toddler-games-language';
-const LEGACY_LANGUAGE_STORAGE_KEY = 'monster-truck-language';
+import {
+    LANGUAGE_STORAGE_KEY,
+    LEGACY_LANGUAGE_STORAGE_KEY,
+    resolveStoredLanguage,
+    saveLanguagePreference
+} from '../../shared/i18n.js';
 
-/**
- * Resolve active language: canonical key, then legacy truck-only key, then default.
- * @returns {'en'|'fr'|'es'}
- */
-export function resolveStoredLanguage() {
-    try {
-        const canonical = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-        if (canonical === 'en' || canonical === 'fr' || canonical === 'es') {
-            return canonical;
-        }
-        const legacy = localStorage.getItem(LEGACY_LANGUAGE_STORAGE_KEY);
-        if (legacy === 'en' || legacy === 'fr' || legacy === 'es') {
-            return legacy;
-        }
-    } catch {
-        /* ignore */
-    }
-    return 'en';
-}
+// Re-export for backwards compatibility
+export { LANGUAGE_STORAGE_KEY, resolveStoredLanguage };
 
 export const translations = {
     en: {
@@ -115,8 +101,9 @@ export function getCurrentLanguage() {
 
 export function setLanguage(lang) {
     currentLanguage = lang;
+    saveLanguagePreference(lang);
+    // Also update legacy key for backwards compatibility
     try {
-        localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
         localStorage.setItem(LEGACY_LANGUAGE_STORAGE_KEY, lang);
     } catch {
         /* ignore */

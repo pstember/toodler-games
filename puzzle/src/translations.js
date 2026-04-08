@@ -1,26 +1,14 @@
+import {
+  LANGUAGE_STORAGE_KEY,
+  LEGACY_LANGUAGE_STORAGE_KEY,
+  resolveStoredLanguage,
+  saveLanguagePreference
+} from '../../shared/i18n.js';
+
+// Re-export for backwards compatibility
+export { LANGUAGE_STORAGE_KEY, resolveStoredLanguage };
+
 /** @typedef {'en'|'fr'|'es'} GameLang */
-
-export const LANGUAGE_STORAGE_KEY = 'toddler-games-language';
-const LEGACY_LANGUAGE_STORAGE_KEY = 'monster-truck-language';
-
-/**
- * @returns {GameLang}
- */
-export function resolveStoredLanguage() {
-  try {
-    const canonical = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (canonical === 'en' || canonical === 'fr' || canonical === 'es') {
-      return canonical;
-    }
-    const legacy = localStorage.getItem(LEGACY_LANGUAGE_STORAGE_KEY);
-    if (legacy === 'en' || legacy === 'fr' || legacy === 'es') {
-      return legacy;
-    }
-  } catch {
-    /* ignore */
-  }
-  return 'en';
-}
 
 /** @type {GameLang} */
 let currentLanguage = resolveStoredLanguage();
@@ -194,8 +182,9 @@ export const translations = {
 export function setLanguage(lang) {
   if (lang !== 'en' && lang !== 'fr' && lang !== 'es') return;
   currentLanguage = lang;
+  saveLanguagePreference(lang);
+  // Also update legacy key for backwards compatibility
   try {
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
     localStorage.setItem(LEGACY_LANGUAGE_STORAGE_KEY, lang);
   } catch {
     /* ignore */
