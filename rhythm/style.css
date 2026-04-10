@@ -151,11 +151,19 @@ body {
   text-shadow: 1px 1px 0 #000;
 }
 
+html[data-theme="dark"] .level-pill:not(.level-pill--active) {
+  background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+  color: #f1f5f9;
+  border-color: var(--card-border);
+}
+
 .challenger-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 22px 1fr;
   gap: 10px;
+  align-items: start;
+  justify-content: start;
+  width: 100%;
   margin: 12px 0 6px;
   cursor: pointer;
   font-weight: 700;
@@ -172,8 +180,9 @@ body {
 .challenger-hint {
   font-size: 0.85rem;
   color: var(--text-secondary);
-  margin: 0 0 12px;
+  margin: 0 0 12px 32px;
   line-height: 1.35;
+  text-align: left;
 }
 
 .splash-content:has(#challenger-checkbox:checked) .splash-section,
@@ -182,19 +191,20 @@ body {
   pointer-events: none;
 }
 
-.splash-extras {
-  margin: 14px 0 8px;
+.splash-options {
+  margin: 0 auto 8px;
   text-align: left;
   width: 100%;
   max-width: 340px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .extra-row {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 22px 1fr;
   gap: 10px;
+  align-items: start;
+  justify-content: start;
+  width: 100%;
   margin-top: 10px;
   cursor: pointer;
   font-weight: 700;
