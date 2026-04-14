@@ -13,28 +13,9 @@ Project-specific conventions for AI-assisted development.
 registry=https://registry.npmjs.org/
 ```
 
-**All CI jobs MUST include registry config step:**
-
-```yaml
-- name: Configure npm to use public registry
-  run: |
-    # Remove any .npmrc files
-    rm -f ~/.npmrc
-    rm -f .npmrc
-
-    # Rewrite package-lock.json to use public npm registry instead of Artifactory
-    if [ -f package-lock.json ]; then
-      echo "Rewriting package-lock.json URLs from Artifactory to public registry..."
-      sed -i 's|https://repox.jfrog.io/artifactory/api/npm/npm/|https://registry.npmjs.org/|g' package-lock.json
-      echo "✅ Rewritten $(grep -c 'registry.npmjs.org' package-lock.json) URLs"
-    fi
-
-    echo "✅ npm configured to use public registry"
-```
-
 **Applies to:** puzzle/, truck/, rhythm/, and any future npm projects.
 
-**Why:** Local dev uses corporate proxy (Artifactory). CI and public contributors need public registry. Pattern ensures both work without manual intervention.
+**CI workflow:** See [.github/CLAUDE.md](.github/CLAUDE.md) for registry config step in CI jobs.
 
 ## Testing Requirements
 
@@ -94,20 +75,7 @@ Use `/caveman-compress <filepath>` to compress new docs.
 
 ## CI/CD Pattern
 
-**Workflows:**
-- `ci.yml` - runs on push/PR to main
-- `deploy.yml` - deploys to GitHub Pages on push to main
-
-**Each game gets own job:**
-- Install deps with `npm ci`
-- Install Playwright browsers with `npx playwright install --with-deps`
-- Run tests with `npm test`
-- Puzzle also runs production build
-
-**Deploy workflow:**
-- Builds puzzle with `VITE_BASE=/toodler-games/puzzle/`
-- Copies truck/, rhythm/, shared/ as static files
-- Uploads to GitHub Pages via Actions artifact (not "Deploy from branch")
+See [.github/CLAUDE.md](.github/CLAUDE.md) for CI/CD workflow patterns.
 
 ## Development Workflow
 
@@ -143,8 +111,8 @@ When adding new game to monorepo:
 - [ ] Create `vitest.config.js` with jsdom environment
 - [ ] Create `playwright.config.js` with webServer config
 - [ ] Add unit tests (vitest)
-- [ ] Add 2-3 critical E2E tests (Playwright)
-- [ ] Add CI job to `.github/workflows/ci.yml` with registry config step
+- [ ] Add minimal E2E tests (Playwright, critical flows only)
+- [ ] Add CI job to `.github/workflows/ci.yml` (see [.github/CLAUDE.md](.github/CLAUDE.md))
 - [ ] Update hub `index.html` with game link
 - [ ] Update root `README.md` project structure table
 - [ ] Use `shared/theme.js` and `shared/i18n.js` for theme/language sync
