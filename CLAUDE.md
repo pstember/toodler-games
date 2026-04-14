@@ -62,7 +62,7 @@ Always write unit tests first. E2E tests are expensive (slow, flaky, hard to deb
 
 **Current coverage:**
 - puzzle: 49 unit + 6 E2E = 55 tests
-- truck: 86 unit + 18 E2E = 104 tests
+- truck: 86 unit + 13 E2E = 99 tests
 - rhythm: 10 unit + 2 E2E = 12 tests
 
 ## Project Structure

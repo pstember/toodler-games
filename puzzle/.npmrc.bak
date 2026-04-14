@@ -1,4 +1,0 @@
-# Use the public registry so `npm ci` works on GitHub Actions and for contributors
-# without your corporate npm proxy. Local machine-level proxy settings are overridden
-# while you are inside this directory (npm reads this file first).
-registry=https://registry.npmjs.org/

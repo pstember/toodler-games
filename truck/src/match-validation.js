@@ -16,6 +16,8 @@ import {
     hideCelebrationOverlay,
     triggerIntermission
 } from './visual-effects.js';
+import { generateLevel } from './levels.js';
+import { handleDragStart } from './drag-drop.js';
 
 /**
  * Validates if an item matches a slot's requirements
