@@ -89,6 +89,20 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: rhythm/package-lock.json
+      - name: Configure npm to use public registry
+        run: |
+          # Remove any .npmrc files
+          rm -f ~/.npmrc
+          rm -f .npmrc
+
+          # Rewrite package-lock.json to use public npm registry instead of Artifactory
+          if [ -f package-lock.json ]; then
+            echo "Rewriting package-lock.json URLs from Artifactory to public registry..."
+            sed -i 's|https://repox.jfrog.io/artifactory/api/npm/npm/|https://registry.npmjs.org/|g' package-lock.json
+            echo "✅ Rewritten $(grep -c 'registry.npmjs.org' package-lock.json) URLs"
+          fi
+
+          echo "✅ npm configured to use public registry"
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm test
