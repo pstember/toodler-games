@@ -38,6 +38,7 @@ jobs:
 
           echo "✅ npm configured to use public registry"
       - run: npm ci
+      - run: npx playwright install --with-deps
       - run: npm test
       - name: Production build (same base as Pages)
         env:
