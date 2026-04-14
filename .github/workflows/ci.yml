@@ -23,9 +23,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: npm
-          cache-dependency-path: puzzle/package-lock.json
-      - run: npm ci
+      - run: npm install --prefer-offline --no-audit
       - run: npm test
       - name: Production build (same base as Pages)
         env:
@@ -44,9 +42,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: npm
-          cache-dependency-path: truck/package-lock.json
-      - run: npm ci
+      - run: npm install --prefer-offline --no-audit
       - run: npx playwright install --with-deps
       - run: npm test
         env:
