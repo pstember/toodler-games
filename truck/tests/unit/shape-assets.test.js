@@ -26,19 +26,12 @@ describe('Shape visual assets', () => {
       });
     });
 
-    it('keeps large hearts on tire PNG (not unscoped SVG-only)', () => {
-      // Unscoped SVG-only hearts were blank in slots (0537313)
+    it('keeps all hearts on tire PNG (large and small)', () => {
+      // SVG-only hearts were blank in slots (0537313); small must keep tire theme
       expect(styleCss).toMatch(/\.heart::after\s*\{[^}]*tire_heart\.png/s);
-      expect(styleCss).not.toMatch(/(?:^|\n)\.heart\.color-\w+\s*\{/);
-    });
-
-    it('uses per-color SVG for small hearts with full rim fill', () => {
-      expect(styleCss).toMatch(
-        /\.size-small\.heart\.color-cyan\s*\{\s*background-image:\s*url\(['"]assets\/images\/tires\/heart-cyan\.svg['"]\)/
-      );
-      expect(styleCss).toMatch(
-        /\.size-small\.heart::before\s*,\s*\.size-small\.heart::after\s*\{[^}]*display:\s*none/s
-      );
+      expect(styleCss).not.toMatch(/\.heart\.color-\w+\s*\{\s*background-image:\s*url\(['"]assets\/images\/tires\/heart-/);
+      expect(styleCss).not.toMatch(/\.size-small\.heart::before\s*,\s*\.size-small\.heart::after\s*\{[^}]*display:\s*none/s);
+      expect(styleCss).toMatch(/\.size-small\.heart::after\s*\{[^}]*background-size:\s*185%/s);
     });
   });
 

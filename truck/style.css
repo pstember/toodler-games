@@ -855,32 +855,20 @@ html[data-theme="dark"] .level-display {
     pointer-events: none;
 }
 
-/* Heart - % polygon scales with box (absolute path() clipped wrong on 80px small) */
+/*
+ * Heart rim fill: fixed 100px box so absolute clip-path coords stay valid,
+ * then scale to fit large/small tire holes. Both sizes keep tire_heart.png.
+ */
 .heart::before {
     content: '';
     position: absolute;
     top: 53%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: 78%;
-    height: 78%;
+    width: 100px;
+    height: 100px;
+    transform: translate(-50%, -50%) scale(0.94);
     background: var(--rim-color);
-    clip-path: polygon(
-        50% 92%,
-        12% 58%,
-        2% 38%,
-        2% 24%,
-        12% 10%,
-        28% 10%,
-        40% 20%,
-        50% 34%,
-        60% 20%,
-        72% 10%,
-        88% 10%,
-        98% 24%,
-        98% 38%,
-        88% 58%
-    );
+    clip-path: path('M50,85 C20,60 5,45 5,30 C5,18 12,10 23,10 C32,10 40,15 50,25 C60,15 68,10 77,10 C88,10 95,18 95,30 C95,45 80,60 50,85 Z');
     z-index: 1;
     pointer-events: none;
 }
@@ -1107,28 +1095,15 @@ html[data-theme="dark"] .level-display {
 }
 
 /*
- * Small hearts: full per-color SVG (tire + heart-shaped rim fill).
- * PNG ::before clip-path could not fill the silver rim hole cleanly
- * at the 80px small box without bleeding past the tire edge.
+ * Small hearts keep tire_heart.png. Slightly higher zoom keeps tread readable
+ * at 80px; scale the fixed 100px fill box to meet the silver rim.
  */
-.size-small.heart {
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.size-small.heart::before,
 .size-small.heart::after {
-    content: none;
-    display: none;
+    background-size: 185%;
 }
-.size-small.heart.color-red { background-image: url('assets/images/tires/heart-red.svg'); }
-.size-small.heart.color-blue { background-image: url('assets/images/tires/heart-blue.svg'); }
-.size-small.heart.color-green { background-image: url('assets/images/tires/heart-green.svg'); }
-.size-small.heart.color-yellow { background-image: url('assets/images/tires/heart-yellow.svg'); }
-.size-small.heart.color-purple { background-image: url('assets/images/tires/heart-purple.svg'); }
-.size-small.heart.color-orange { background-image: url('assets/images/tires/heart-orange.svg'); }
-.size-small.heart.color-pink { background-image: url('assets/images/tires/heart-pink.svg'); }
-.size-small.heart.color-cyan { background-image: url('assets/images/tires/heart-cyan.svg'); }
+.size-small.heart::before {
+    transform: translate(-50%, -50%) scale(0.78);
+}
 
 /* Diamond needs to preserve rotation */
 .size-small.diamond::before {
