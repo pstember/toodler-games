@@ -37,7 +37,7 @@ test.describe('Level Generation', () => {
     }
   });
 
-  test('Level 5 (Tier 2) generates 2 slots and 4 inventory items', async ({ page }) => {
+  test('Level 5 (Tier 2) generates 2 slots and 5 inventory items', async ({ page }) => {
     const game = new GamePage(page);
     await game.navigate();
     await game.generateLevel(5);
@@ -46,10 +46,10 @@ test.describe('Level Generation', () => {
     const items = await game.getInventoryItems();
 
     expect(slots).toHaveLength(2);
-    expect(items).toHaveLength(4);
+    expect(items).toHaveLength(5);
   });
 
-  test('Level 10 (Tier 4) generates 3 slots and 6 items with size variations', async ({ page }) => {
+  test('Level 10 (Tier 4) generates 4 slots and 7 items with size variations', async ({ page }) => {
     const game = new GamePage(page);
     await game.navigate();
     await game.generateLevel(10);
@@ -57,8 +57,8 @@ test.describe('Level Generation', () => {
     const slots = await game.getSlots();
     const items = await game.getInventoryItems();
 
-    expect(slots).toHaveLength(3);
-    expect(items).toHaveLength(6);
+    expect(slots).toHaveLength(4);
+    expect(items).toHaveLength(7);
 
     // Check that sizes vary (at least some large and some small)
     const sizes = items.map(item => item.size);
@@ -66,11 +66,10 @@ test.describe('Level Generation', () => {
     const hasSmall = sizes.includes('small');
 
     // At level 10, size variations are enabled, so we should see both
-    // (statistically very unlikely to get all same size with 6 items)
     expect(hasLarge || hasSmall).toBe(true);
   });
 
-  test('Level 15 (Endless) generates 2-4 slots and 4-8 items', async ({ page }) => {
+  test('Level 15 (Endless) generates 4-5 slots and 7-9 items', async ({ page }) => {
     const game = new GamePage(page);
     await game.navigate();
     await game.generateLevel(15);
@@ -78,11 +77,11 @@ test.describe('Level Generation', () => {
     const slots = await game.getSlots();
     const items = await game.getInventoryItems();
 
-    expect(slots.length).toBeGreaterThanOrEqual(2);
-    expect(slots.length).toBeLessThanOrEqual(4);
+    expect(slots.length).toBeGreaterThanOrEqual(4);
+    expect(slots.length).toBeLessThanOrEqual(5);
 
-    expect(items.length).toBeGreaterThanOrEqual(4);
-    expect(items.length).toBeLessThanOrEqual(8);
+    expect(items.length).toBeGreaterThanOrEqual(7);
+    expect(items.length).toBeLessThanOrEqual(9);
   });
 
   test('inventory contains at least one correct match per slot', async ({ page }) => {

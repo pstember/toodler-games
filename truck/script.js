@@ -35,6 +35,7 @@ import { startMudWashGame } from './src/minigames/mud-wash.js';
 import { startStickerShopGame } from './src/minigames/sticker-shop.js';
 import { startBigJumpGame } from './src/minigames/big-jump.js';
 import { startBubbleWrapGame } from './src/minigames/bubble-wrap.js';
+import { startFuelUpGame } from './src/minigames/fuel-up.js';
 
 // ===================================
 // EXPOSE FUNCTIONS FOR TESTING
@@ -124,6 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'bubble-wrap':
                     case 'bubbles':
                         startBubbleWrapGame();
+                        break;
+                    case 'fuel-up':
+                    case 'fuel':
+                        startFuelUpGame();
                         break;
                     default:
                         // Unknown mini-game - show normal game

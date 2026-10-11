@@ -180,6 +180,25 @@
                 </div>
             </div>
 
+            <!-- Fuel Up Game -->
+            <div id="fuel-up-game" class="mini-game hidden">
+                <div class="mini-game-title" data-i18n="fuel-up-title">⛽ FUEL UP! ⛽</div>
+                <div class="mini-game-instructions" data-i18n="fuel-up-instructions">Tap the pump to fill the tank!</div>
+                <div class="fuel-scene">
+                    <div id="fuel-truck" class="fuel-truck">
+                        <img src="assets/monster_truck.png" alt="Monster truck waiting for fuel" class="truck-image">
+                    </div>
+                    <div class="fuel-tank-wrap">
+                        <div class="fuel-tank-label" data-i18n="fuel">Fuel</div>
+                        <div id="fuel-progress-bar" class="fuel-tank" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Fuel tank level">
+                            <div id="fuel-fill" class="fuel-fill"></div>
+                        </div>
+                        <div class="fuel-percent" aria-live="polite"><span id="fuel-progress-text">0%</span></div>
+                    </div>
+                </div>
+                <button id="fuel-pump-btn" class="giant-button" data-i18n="pump" aria-label="Pump fuel into the truck">PUMP!</button>
+            </div>
+
         </div>
     </div>
 

@@ -115,7 +115,7 @@ export function triggerIntermission() {
     }
 
     // Randomly select a mini-game
-    const games = ['mud-wash', 'sticker-shop', 'big-jump', 'bubble-wrap'];
+    const games = ['mud-wash', 'sticker-shop', 'big-jump', 'bubble-wrap', 'fuel-up'];
     const selectedGame = games[Math.floor(Math.random() * games.length)];
 
     // Dynamic imports for minigames
@@ -131,6 +131,9 @@ export function triggerIntermission() {
             break;
         case 'bubble-wrap':
             import('./minigames/bubble-wrap.js').then(({ startBubbleWrapGame }) => startBubbleWrapGame());
+            break;
+        case 'fuel-up':
+            import('./minigames/fuel-up.js').then(({ startFuelUpGame }) => startFuelUpGame());
             break;
     }
 }
