@@ -4,7 +4,8 @@ import {
   getTongueParams,
   setTongueParams,
   resetTongueParams,
-  setTongueParam
+  setTongueParam,
+  clampTongueParams
 } from './tongue-params.js';
 
 describe('Tongue Parameters', () => {
@@ -100,14 +101,26 @@ describe('Tongue Parameters', () => {
     it('works with all default keys', () => {
       const keys = Object.keys(DEFAULT_TONGUE_PARAMS);
 
-      keys.forEach((key, index) => {
-        setTongueParam(key, index * 10);
+      keys.forEach((key) => {
+        setTongueParam(key, DEFAULT_TONGUE_PARAMS[key]);
       });
 
       const params = getTongueParams();
-      keys.forEach((key, index) => {
-        expect(params[key]).toBe(index * 10);
+      keys.forEach((key) => {
+        expect(params[key]).toBe(DEFAULT_TONGUE_PARAMS[key]);
       });
+    });
+
+    it('ignores unknown keys', () => {
+      setTongueParam('notARealKey', 99);
+      expect(getTongueParams().notARealKey).toBeUndefined();
+    });
+
+    it('clamps pad so tab span remains feasible', () => {
+      setTongueParam('tabSpanMin', 0.58);
+      setTongueParam('edgeVertexPad', 0.24);
+      const params = getTongueParams();
+      expect(2 * params.edgeVertexPad + params.tabSpanMin).toBeLessThanOrEqual(1 + 1e-6);
     });
 
     it('updates cornerDamp2 correctly', () => {
@@ -130,6 +143,18 @@ describe('Tongue Parameters', () => {
 
       const params = getTongueParams();
       expect(params.refLen).toBe(0.3);
+    });
+  });
+
+  describe('clampTongueParams', () => {
+    it('orders min/max pairs', () => {
+      const c = clampTongueParams({
+        ...DEFAULT_TONGUE_PARAMS,
+        amplitudeMin: 2,
+        amplitudeMax: 1,
+      });
+      expect(c.amplitudeMin).toBe(1);
+      expect(c.amplitudeMax).toBe(2);
     });
   });
 });

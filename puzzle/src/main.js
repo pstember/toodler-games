@@ -6,6 +6,7 @@ import {
   resetTongueParams,
   DEFAULT_TONGUE_PARAMS,
 } from './tongue-params.js';
+import { resolveDropSlot, collectBoardSlotRects } from './drop-target.js';
 import { setLanguage, resolveStoredLanguage, tCurrent } from './translations.js';
 import { initThemeManagement, CANONICAL_THEME_COLORS } from '../../shared/theme.js';
 
@@ -107,10 +108,18 @@ function updateHintsForTray() {
   if (!state || !state.tray) {
     return;
   }
-  // Start timers for all pieces in the tray
+  // Only start timers for pieces that do not already have one (avoid reset on every place)
   state.tray.forEach((pieceId) => {
-    startHintTimer(pieceId);
+    if (!hintTimers.has(pieceId)) {
+      startHintTimer(pieceId);
+    }
   });
+  // Drop timers for pieces no longer in the tray
+  for (const pieceId of hintTimers.keys()) {
+    if (!state.tray.includes(pieceId)) {
+      clearHint(pieceId);
+    }
+  }
 }
 
 function generateAllClipPaths() {
@@ -620,8 +629,10 @@ function clearDragDropHighlight(ds) {
 function updateDragDropHighlight(ds, clientX, clientY) {
   if (!ds || !state) return;
   clearDragDropHighlight(ds);
-  const stack = document.elementsFromPoint(clientX, clientY);
-  const slotEl = stack.find((el) => el.classList?.contains('board-slot'));
+  const slots = collectBoardSlotRects();
+  const slotIndex = resolveDropSlot(ds.pieceId, clientX, clientY, slots);
+  if (slotIndex === null) return;
+  const slotEl = document.querySelector(`.board-slot[data-slot-index="${slotIndex}"]`);
   if (!slotEl || !slotEl.classList.contains('board-slot--empty')) return;
   ds.lastDropHighlight = slotEl;
   slotEl.classList.add('board-slot--drop-hover');
@@ -711,14 +722,13 @@ function onTrayPointerDown(e) {
     dragState = null;
     cl.remove();
 
-    const stack = document.elementsFromPoint(clientX, clientY);
-    const slotEl = stack.find((el) => el.classList?.contains('board-slot'));
-    if (slotEl) {
-      const slotIndex = parseInt(slotEl.dataset.slotIndex, 10);
-      if (tryDrop(pid, slotIndex)) {
-        return;
-      }
+    const slots = collectBoardSlotRects();
+    const slotIndex = resolveDropSlot(pid, clientX, clientY, slots);
+    if (slotIndex !== null && tryDrop(pid, slotIndex)) {
+      return;
     }
+    // Failed or empty drop: restart hint timer for this piece
+    startHintTimer(pid);
   }
 
   function onUp(ev) {

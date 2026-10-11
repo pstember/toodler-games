@@ -5,7 +5,7 @@
 Web **jigsaw** for toddlers (3+): drag pieces from **tray** to **fixed board**; piece **snaps** only into **correct** slot. Wrong drops return tray.
 
 **Platform**: Static single-page app (Vite build → one `dist/index.html`).  
-**UI language**: French.  
+**UI language**: English / French / Spanish (`shared/i18n.js` + `translations.js`).  
 **Piece shapes**: **Voronoi cells** with **BSC-style "tongue" edges** on internal cuts (not rectangular grid).
 
 ## Repository layout
@@ -62,13 +62,18 @@ Reference idea: [Mathematica SE — Voronoi jigsaw cuts](https://mathematica.sta
 ### Image pipeline
 
 - **Cover** crop in canvas to match grid aspect ratio (`cols`×`rows`).
-- **Background position**: `backgroundPercentForPiece(pieceId, cols, rows)` maps fragment to `%` position (see `puzzle-logic.js`).
+- **Background placement**: board/tray surfaces use Voronoi bbox + `backgroundSize` / `backgroundPosition` in `main.js` (not `backgroundPercentForPiece`; that helper remains for tests/legacy).
 - Default Unsplash image + upload + gradient fallback (CORS/taint handling in `main.js`).
+
+### Drag / drop hit-test
+
+- Overlapping Voronoi AABBs: `resolveDropSlot` (`drop-target.js`) prefers **correct empty slot** under pointer, else topmost empty.
+- Failed drop restarts that piece's hint timer.
 
 ### Hints
 
 - **Aide**: toggles `#hint-overlay` visibility (opacity over board).
-- **Delayed slot highlight**: `startHintTimer` / `board-slot--hint` after `HINT_DELAY_MS` (5s) exist in code; start timers for all tray pieces (`updateHintsForTray`) **not** called from `renderTray` (commented for debug). Parents rely on overlay.
+- **Delayed slot highlight**: `startHintTimer` / `board-slot--hint` after `HINT_DELAY_MS` (5s). `updateHintsForTray` from `renderTray` starts timers only for pieces without active timer (no full reset on every place).
 
 ### Win flow
 
@@ -85,9 +90,10 @@ Reference idea: [Mathematica SE — Voronoi jigsaw cuts](https://mathematica.sta
 | Module | Role |
 |--------|------|
 | `puzzle-logic.js` | State, legality, win, `createSeededRandom`, `backgroundPercentForPiece` |
+| `drop-target.js` | Pure drop hit-test over overlapping slot AABBs |
 | `voronoi-jigsaw.js` | `buildVoronoiJigsaw(cols, rows, rng, tongueParams)` → `pieceGeometry` |
 | `bsc-tongue.js` | NURBS-style tongue polyline along an edge |
-| `tongue-params.js` | `DEFAULT_TONGUE_PARAMS`, `getTongueParams`, `setTongueParam`, … |
+| `tongue-params.js` | `DEFAULT_TONGUE_PARAMS`, clamp, `getTongueParams`, `setTongueParam`, … |
 | `main.js` | Wiring, `generateAllClipPaths`, `renderBoard` / `renderTray`, drag, theme, sliders |
 
 ## Build and test
@@ -133,7 +139,7 @@ Recent browsers with **CSS `clip-path: url(#id)`**, **Canvas**, **Pointer events
 
 ## File manifest (source)
 
-`index.html`, `src/main.js`, `src/puzzle-logic.js`, `src/puzzle-logic.test.js`, `src/voronoi-jigsaw.js`, `src/voronoi-jigsaw.test.js`, `src/bsc-tongue.js`, `src/bsc-tongue.test.js`, `src/tongue-params.js`, `e2e/game.spec.js`, `vite.config.js`, `vitest.config.js`, `playwright.config.js`, `package.json`, `README.md`, `SPEC.md`.
+`index.html`, `src/main.js`, `src/puzzle-logic.js`, `src/drop-target.js`, `src/voronoi-jigsaw.js`, `src/bsc-tongue.js`, `src/tongue-params.js`, `src/*.test.js`, `e2e/game.spec.js`, `vite.config.js`, `vitest.config.js`, `playwright.config.js`, `package.json`, `README.md`, `SPEC.md`.
 
 ---
 
@@ -144,4 +150,4 @@ Recent browsers with **CSS `clip-path: url(#id)`**, **Canvas**, **Pointer events
 3. `npm run build` → deploy `dist/index.html`.
 4. In browser: `window.__PUZZLE_TEST__?.solve()` verify win UI.
 
-**Last reviewed**: 2026-04-04 (aligned with Voronoi impl and current UI).
+**Last reviewed**: 2026-10-11 (drop hit-test, hints, multi-lang, Voronoi backgrounds).

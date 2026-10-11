@@ -63,7 +63,7 @@ jobs:
           cp index.html _site/
           rsync -a --exclude node_modules --exclude test-results --exclude playwright-report --exclude coverage --exclude .git truck/ _site/truck/
           cp -R puzzle/dist/. _site/puzzle/
-          rsync -a --exclude .git rhythm/ _site/rhythm/
+          rsync -a --exclude node_modules --exclude test-results --exclude playwright-report --exclude coverage --exclude tests --exclude .git --exclude '*.test.js' rhythm/ _site/rhythm/
           cp -R shared/. _site/shared/
           touch _site/.nojekyll
 

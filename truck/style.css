@@ -1522,9 +1522,10 @@ html[data-theme="dark"] .level-display {
 .jump-scene {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 360px;
     margin-bottom: 50px;
-    overflow: hidden;
+    /* Allow backflip apex (translateY up to -250px) to stay visible */
+    overflow: visible;
 }
 
 .jump-truck {
@@ -1579,7 +1580,7 @@ html[data-theme="dark"] .level-display {
     width: 100vw;
     height: 100vh;
     pointer-events: none;
-    z-index: 1;
+    z-index: 200;
 }
 
 .firework {
@@ -1587,6 +1588,8 @@ html[data-theme="dark"] .level-display {
     width: 8px;
     height: 8px;
     border-radius: 50%;
+    --tx: 0px;
+    --ty: 0px;
     animation: explode 1s ease-out forwards;
 }
 

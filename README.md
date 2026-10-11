@@ -46,4 +46,4 @@ If Pages set to deploy `main` branch at repository root, GitHub serves raw [`puz
 | **Truck only, locally** | No install: `npx serve .` from repo root (or `npx serve truck` from anywhere) and open URL. Truck game is plain static files. |
 | **Puzzle only, locally** | Either use hosted Pages URL, or run `npm ci && npm run dev` inside `puzzle/` (uses [`puzzle/.npmrc`](puzzle/.npmrc)), or `npm run build` then `npx serve puzzle/dist`. |
 | **Rhythm only, locally** | No install: `npx serve .` from repo root and open `/rhythm/` (static ES modules, like Truck). |
-| **Run Playwright tests** | Needs `npm ci` in `truck/` (or `puzzle/` for e2e) with lockfiles as committed. |
+| **Run Playwright tests** | Needs `npm ci` in `truck/`, `puzzle/`, or `rhythm/` with lockfiles as committed. |

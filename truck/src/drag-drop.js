@@ -19,12 +19,22 @@ export function handleDragStart(e) {
         return;
     }
 
+    // Block drag during level complete drive-off or mini-game intermission
+    if (gameState.levelCompleting || gameState.isInIntermission) {
+        return;
+    }
+
     const item = e.currentTarget;
     gameState.currentDragItem = item;
 
     // Get touch or mouse position
-    const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-    const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+    const touch = e.type === 'touchstart' ? e.touches?.[0] : null;
+    if (e.type === 'touchstart' && !touch) {
+        gameState.currentDragItem = null;
+        return;
+    }
+    const clientX = touch ? touch.clientX : e.clientX;
+    const clientY = touch ? touch.clientY : e.clientY;
 
     // Get current viewport position BEFORE changing anything
     const rect = item.getBoundingClientRect();
@@ -84,8 +94,10 @@ export function handleDragMove(e) {
 
     e.preventDefault();
 
-    const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-    const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+    const touch = e.type === 'touchmove' ? e.touches?.[0] : null;
+    if (e.type === 'touchmove' && !touch) return;
+    const clientX = touch ? touch.clientX : e.clientX;
+    const clientY = touch ? touch.clientY : e.clientY;
 
     // Cancel any pending animation frame to avoid stacking
     if (gameState.rafId) {
@@ -132,8 +144,9 @@ export function handleDragEnd(e) {
     if (!gameState.currentDragItem) return;
 
     const item = gameState.currentDragItem;
-    const clientX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
-    const clientY = e.type === 'touchend' ? e.changedTouches[0].clientY : e.clientY;
+    const touch = e.type === 'touchend' ? e.changedTouches?.[0] : null;
+    const clientX = touch ? touch.clientX : e.clientX;
+    const clientY = touch ? touch.clientY : e.clientY;
 
     // Remove highlight from current hover slot
     if (gameState.currentHoverSlot) {

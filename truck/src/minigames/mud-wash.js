@@ -170,21 +170,34 @@ export function startMudWashGame() {
     // Initial progress
     updateProgress();
 
-    // Create listener functions for cleanup
-    const onMouseDown = () => {
-        isDrawing = true;
-        if (!rafId) {
-            rafId = requestAnimationFrame(drawLoop);
-        }
-    };
+    function refreshCanvasRect() {
+        cachedCanvasRect = canvas.getBoundingClientRect();
+    }
 
-    const onMouseUp = () => {
+    function stopDrawing() {
         isDrawing = false;
         currentMousePos = { x: null, y: null };
         if (rafId) {
             cancelAnimationFrame(rafId);
             rafId = null;
         }
+    }
+
+    // Create listener functions for cleanup
+    const onMouseDown = (e) => {
+        refreshCanvasRect();
+        isDrawing = true;
+        currentMousePos = {
+            x: e.clientX - cachedCanvasRect.left,
+            y: e.clientY - cachedCanvasRect.top
+        };
+        if (!rafId) {
+            rafId = requestAnimationFrame(drawLoop);
+        }
+    };
+
+    const onMouseUp = () => {
+        stopDrawing();
     };
 
     const onMouseMove = (e) => {
@@ -199,19 +212,21 @@ export function startMudWashGame() {
 
     const onTouchStart = (e) => {
         e.preventDefault();
+        const touch = e.touches[0];
+        if (!touch) return;
+        refreshCanvasRect();
         isDrawing = true;
+        currentMousePos = {
+            x: touch.clientX - cachedCanvasRect.left,
+            y: touch.clientY - cachedCanvasRect.top
+        };
         if (!rafId) {
             rafId = requestAnimationFrame(drawLoop);
         }
     };
 
     const onTouchEnd = () => {
-        isDrawing = false;
-        currentMousePos = { x: null, y: null };
-        if (rafId) {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-        }
+        stopDrawing();
     };
 
     const onTouchMove = (e) => {
@@ -226,13 +241,14 @@ export function startMudWashGame() {
         }
     };
 
-    // Add event listeners
+    // Start/move on canvas; end on document so release outside canvas stops drawing
     canvas.addEventListener('mousedown', onMouseDown);
-    canvas.addEventListener('mouseup', onMouseUp);
     canvas.addEventListener('mousemove', onMouseMove);
-    canvas.addEventListener('touchstart', onTouchStart);
-    canvas.addEventListener('touchend', onTouchEnd);
-    canvas.addEventListener('touchmove', onTouchMove);
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('touchend', onTouchEnd);
+    document.addEventListener('touchcancel', onTouchEnd);
 
     // Store listeners and RAF ID for cleanup
     mudWashListeners = {
@@ -244,13 +260,16 @@ export function startMudWashGame() {
                 rafId = null;
             }
         },
-        listeners: [
+        canvasListeners: [
             { type: 'mousedown', handler: onMouseDown },
-            { type: 'mouseup', handler: onMouseUp },
             { type: 'mousemove', handler: onMouseMove },
             { type: 'touchstart', handler: onTouchStart },
-            { type: 'touchend', handler: onTouchEnd },
             { type: 'touchmove', handler: onTouchMove }
+        ],
+        documentListeners: [
+            { type: 'mouseup', handler: onMouseUp },
+            { type: 'touchend', handler: onTouchEnd },
+            { type: 'touchcancel', handler: onTouchEnd }
         ]
     };
 }
@@ -260,14 +279,16 @@ export function startMudWashGame() {
  */
 export function cleanupMudWashListeners() {
     if (mudWashListeners) {
-        const { canvas, listeners, cancelRaf } = mudWashListeners;
+        const { canvas, canvasListeners, documentListeners, cancelRaf } = mudWashListeners;
 
         // Cancel any pending animation frame
         cancelRaf();
 
-        // Remove event listeners
-        listeners.forEach(({ type, handler }) => {
+        canvasListeners.forEach(({ type, handler }) => {
             canvas.removeEventListener(type, handler);
+        });
+        documentListeners.forEach(({ type, handler }) => {
+            document.removeEventListener(type, handler);
         });
 
         mudWashListeners = null;

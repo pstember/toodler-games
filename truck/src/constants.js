@@ -111,9 +111,10 @@ export const TIER_CONFIG = {
 // FIREWORK ANIMATION CONSTANTS
 // ===================================
 
+/** Burst offset jitter in px (applied to --tx/--ty). */
 export const FIREWORK_POSITION_VARIANCE = {
-    horizontal: 20, // ±20%
-    vertical: 20    // ±20%
+    horizontal: 40,
+    vertical: 40
 };
 
 export const FIREWORK_POSITION_CENTER = {
@@ -121,8 +122,9 @@ export const FIREWORK_POSITION_CENTER = {
     top: 30    // 30% from top
 };
 
-export const FIREWORK_DISTANCE_MIN = 50;
-export const FIREWORK_DISTANCE_MAX = 150;
+/** Radial burst distance in px for --tx/--ty. */
+export const FIREWORK_DISTANCE_MIN = 60;
+export const FIREWORK_DISTANCE_MAX = 180;
 
 // ===================================
 // PERFORMANCE CONSTANTS

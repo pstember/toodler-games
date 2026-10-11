@@ -42,10 +42,10 @@ Always write unit tests first. E2E tests are expensive (slow, flaky, hard to deb
 - E2E tests (Playwright, minimal - critical flows only)
 - CI job in `.github/workflows/ci.yml`
 
-**Current coverage:**
-- puzzle: 49 unit + 6 E2E = 55 tests
-- truck: 86 unit + 13 E2E = 99 tests
-- rhythm: 10 unit + 2 E2E = 12 tests
+**Current coverage (approx; prefer unit):**
+- puzzle: unit (logic, Voronoi, drop-target, tongue) + minimal E2E
+- truck: unit (drag, levels, match, visual-effects) + minimal E2E
+- rhythm: unit (`game-logic.js` scoring/hit resolve) + minimal E2E
 
 ## Project Structure
 
