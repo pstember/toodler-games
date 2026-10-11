@@ -145,17 +145,18 @@ describe('Visual Effects', () => {
       expect(fireworkElements.length).toBe(FIREWORK_COUNT);
     });
 
-    it('positions fireworks with percentage-based coordinates', () => {
+    it('spawns near center and sets explode --tx/--ty offsets', () => {
       createFireworks();
 
       const fireworkElements = document.querySelectorAll('.firework');
 
       fireworkElements.forEach(fw => {
-        const left = fw.style.left;
-        const top = fw.style.top;
-
-        expect(left).toMatch(/%$/);
-        expect(top).toMatch(/%$/);
+        expect(fw.style.left).toBe('50%');
+        expect(fw.style.top).toBe('30%');
+        const tx = fw.style.getPropertyValue('--tx');
+        const ty = fw.style.getPropertyValue('--ty');
+        expect(tx).toMatch(/^-?\d+(\.\d+)?px$/);
+        expect(ty).toMatch(/^-?\d+(\.\d+)?px$/);
       });
     });
 

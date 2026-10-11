@@ -3,6 +3,14 @@
  */
 import { initThemeManagement, CANONICAL_THEME_COLORS } from '../shared/theme.js';
 import { setLanguage, getCurrentLanguage, translate } from './translations.js';
+import {
+  starsFromHits,
+  infiniteTierFromElapsed,
+  shuffleInPlace,
+  resolveHit,
+  notesPastMissGrace,
+  INFINITE_RAMP_SEC
+} from './game-logic.js';
 
 const LEAD_IN_SEC = 2;
 
@@ -42,17 +50,7 @@ const INFINITE_EXTEND_BUFFER_SEC = 14;
 const INFINITE_MAX_MISSES = 5;
 /** ♾️ hearts shown — one greys out per miss (game over when misses exceed max). */
 const INFINITE_LIFE_HEARTS = INFINITE_MAX_MISSES + 1;
-/** ♾️ mode: advance one difficulty step (level 1 → 2 → 3) every this many seconds. */
-const INFINITE_RAMP_SEC = 60;
-
 const LANE_COLORS = ['#22c55e', '#eab308', '#ef4444', '#3b82f6'];
-
-function shuffleInPlace(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
 
 function getPatternLanes() {
   const base = state.laneCount === 4 ? [...PATTERN_4] : [...PATTERN_3];
@@ -155,14 +153,6 @@ function appendInfiniteSegment() {
   });
 }
 
-function starsFromHits(hits, total) {
-  if (total === 0) return 3;
-  const ratio = hits / total;
-  if (ratio >= 0.85) return 3;
-  if (ratio >= 0.55) return 2;
-  return 1;
-}
-
 function playHitSound(ctx, lane) {
   const o = ctx.createOscillator();
   const g = ctx.createGain();
@@ -213,6 +203,8 @@ function showTimingFeedback(kind, translationKey) {
  * Full-screen edge flash: red only for "too late" tap; purple (same as wrong color) for wrong lane, too soon, and auto-missed notes.
  * @param {'late' | 'wrong'} kind - 'late' = red glow; anything else = purple glow (wrong / early / miss)
  */
+let flashClearTimer = 0;
+
 function flashGameUi(kind) {
   const ui = document.getElementById('game-ui');
   if (!ui || ui.classList.contains('hidden')) return;
@@ -223,7 +215,8 @@ function flashGameUi(kind) {
   } else {
     ui.classList.add('wrong-flash');
   }
-  setTimeout(() => {
+  clearTimeout(flashClearTimer);
+  flashClearTimer = setTimeout(() => {
     ui.classList.remove('late-flash', 'wrong-flash');
   }, 450);
 }
@@ -251,6 +244,8 @@ const state = {
   notes: [],
   playing: false,
   startMs: 0,
+  /** AudioContext.currentTime at song start (keeps visuals + SFX on one clock). */
+  startAudioTime: null,
   hits: 0,
   audioCtx: null,
   animationId: 0,
@@ -275,7 +270,9 @@ const state = {
   infiniteRampTier: 1,
   /** ♾️ metronome: last integer beat index played (game time). */
   lastMetronomeBeatIndex: -1,
-  noteIdSeq: 0
+  noteIdSeq: 0,
+  /** Wall-clock ms when tab was hidden (pause support). */
+  hiddenAtMs: null
 };
 
 function resetCombo() {
@@ -398,11 +395,6 @@ function updateInfiniteTierBadge() {
   }
 }
 
-/** Compute ♾️ difficulty tier from elapsed seconds: 1, then 2 after one ramp, then 3. */
-function infiniteTierFromElapsed(t) {
-  return Math.min(3, Math.floor(t / INFINITE_RAMP_SEC) + 1);
-}
-
 function applyInfiniteTierIfNeeded(t) {
   if (!state.infiniteMode || !state.playing) return;
   const next = infiniteTierFromElapsed(t);
@@ -452,6 +444,10 @@ function resizeCanvas(canvas, ctx) {
 }
 
 function elapsedSec() {
+  // Prefer audio clock when available so notes and SFX stay aligned
+  if (state.audioCtx && state.startAudioTime != null) {
+    return state.audioCtx.currentTime - state.startAudioTime;
+  }
   return (performance.now() - state.startMs) / 1000;
 }
 
@@ -535,17 +531,18 @@ function draw(ctx, canvas) {
     ctx.globalAlpha = 1;
   }
 
+}
+
+function processAutoMisses(t) {
   const missGrace = state.hitWindow * 1.2;
-  for (const n of state.notes) {
-    if (n.hit || n.missed) continue;
-    if (t > n.time + missGrace) {
-      consumeNoteMiss(n);
-      resetCombo();
-      if (state.audioCtx) {
-        playFailSound(state.audioCtx);
-      }
-      flashGameUi('wrong');
+  const overdue = notesPastMissGrace(state.notes, t, missGrace);
+  for (const n of overdue) {
+    consumeNoteMiss(n);
+    resetCombo();
+    if (state.audioCtx) {
+      playFailSound(state.audioCtx);
     }
+    flashGameUi('wrong');
   }
 }
 
@@ -554,6 +551,7 @@ function gameLoop(canvas, ctx) {
   if (!state.playing) return;
 
   const t = elapsedSec();
+  processAutoMisses(t);
 
   if (state.infiniteMode && state.audioCtx) {
     applyInfiniteTierIfNeeded(t);
@@ -590,56 +588,29 @@ function tryHit(lane) {
   if (lane < 0 || lane >= state.laneCount) return;
 
   const t = elapsedSec();
-  const hw = state.hitWindow;
-  const wkw = state.wrongKeyWindow;
-  const active = state.notes.filter((n) => !n.hit && !n.missed);
+  const result = resolveHit(
+    state.notes,
+    lane,
+    t,
+    state.hitWindow,
+    state.wrongKeyWindow,
+    getPerfectWindowSec()
+  );
 
-  if (active.length === 0) {
-    playFailSound(state.audioCtx);
-    resetCombo();
-    showTimingFeedback('empty', 'fail-no-note');
-    return;
+  if (result.consume && result.note) {
+    consumeNoteMiss(result.note);
   }
 
-  let g = active[0];
-  let bestAbs = Math.abs(g.time - t);
-  for (let i = 1; i < active.length; i++) {
-    const n = active[i];
-    const a = Math.abs(n.time - t);
-    if (a < bestAbs) {
-      bestAbs = a;
-      g = n;
-    }
-  }
-
-  if (g.lane !== lane) {
-    playFailSound(state.audioCtx);
-    resetCombo();
-    consumeNoteMiss(g);
-    if (bestAbs <= wkw) {
-      showTimingFeedback('wrong', 'fail-wrong');
-      flashGameUi('wrong');
-    } else {
-      showTimingFeedback('empty', 'fail-no-note');
-    }
-    return;
-  }
-
-  const delta = g.time - t;
-
-  if (Math.abs(delta) <= hw) {
+  if (result.kind === 'perfect' || result.kind === 'good') {
+    const g = result.note;
     g.hit = true;
     state.hits += 1;
     state.combo += 1;
     updateComboBar();
-
     const live = document.getElementById('live-hits');
     if (live) live.textContent = String(state.hits);
-
     playHitSound(state.audioCtx, lane);
-
-    const perfectW = Math.min(getPerfectWindowSec(), hw);
-    if (Math.abs(delta) <= perfectW) {
+    if (result.kind === 'perfect') {
       showTimingFeedback('perfect', 'hit-perfect');
     } else {
       showTimingFeedback('hit-good', 'hit-good');
@@ -650,16 +621,22 @@ function tryHit(lane) {
   playFailSound(state.audioCtx);
   resetCombo();
 
-  if (delta > hw) {
-    consumeNoteMiss(g);
+  if (result.kind === 'wrong') {
+    showTimingFeedback('wrong', 'fail-wrong');
+    flashGameUi('wrong');
+    return;
+  }
+  if (result.kind === 'early') {
     showTimingFeedback('early', 'fail-early');
     flashGameUi('wrong');
     return;
   }
-
-  consumeNoteMiss(g);
-  showTimingFeedback('late', 'fail-late');
-  flashGameUi('late');
+  if (result.kind === 'late') {
+    showTimingFeedback('late', 'fail-late');
+    flashGameUi('late');
+    return;
+  }
+  showTimingFeedback('empty', 'fail-no-note');
 }
 
 function endSong() {
@@ -730,6 +707,8 @@ function startSong(canvas, ctx) {
   if (live) live.textContent = '0';
   state.playing = true;
   state.startMs = performance.now();
+  state.startAudioTime = null;
+  state.hiddenAtMs = null;
   updateInfiniteTierBadge();
   updateLifeHearts();
 
@@ -738,19 +717,24 @@ function startSong(canvas, ctx) {
     state.audioCtx = new AudioCtx();
   }
   const ctxA = state.audioCtx;
+
+  const beginPlayback = () => {
+    state.startAudioTime = ctxA.currentTime;
+    state.startMs = performance.now();
+    const lastT = state.notes.at(-1).time;
+    if (!state.infiniteMode) {
+      const beatCount = Math.ceil(lastT / state.beat) + 4;
+      scheduleBackingClicks(ctxA, state.startAudioTime + 0.05, beatCount, state.beat);
+    }
+    document.getElementById('win-overlay')?.classList.add('hidden');
+    gameLoop(canvas, ctx);
+  };
+
   if (ctxA.state === 'suspended') {
-    ctxA.resume();
+    ctxA.resume().then(beginPlayback).catch(beginPlayback);
+  } else {
+    beginPlayback();
   }
-
-  const now = ctxA.currentTime;
-  const lastT = state.notes.at(-1).time;
-  if (!state.infiniteMode) {
-    const beatCount = Math.ceil(lastT / state.beat) + 4;
-    scheduleBackingClicks(ctxA, now + 0.05, beatCount, state.beat);
-  }
-
-  document.getElementById('win-overlay')?.classList.add('hidden');
-  gameLoop(canvas, ctx);
 }
 
 function wireLaneButtons() {
@@ -803,6 +787,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', onResize);
   onResize();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (state.playing) {
+        state.hiddenAtMs = performance.now();
+        cancelAnimationFrame(state.animationId);
+        if (state.audioCtx?.state === 'running') {
+          state.audioCtx.suspend();
+        }
+      }
+      return;
+    }
+    if (!state.playing || state.hiddenAtMs == null) return;
+    const pausedMs = performance.now() - state.hiddenAtMs;
+    state.hiddenAtMs = null;
+    state.startMs += pausedMs;
+    const resume = state.audioCtx?.resume?.() ?? Promise.resolve();
+    resume.then(() => {
+      if (state.audioCtx && state.startAudioTime != null) {
+        // Keep audio-relative clock continuous across suspend
+        state.startAudioTime = state.audioCtx.currentTime - (performance.now() - state.startMs) / 1000;
+      }
+      gameLoop(canvas, ctx);
+    });
+  });
 
   wireLaneButtons();
   wireLevelPills();

@@ -66,21 +66,19 @@ function getTier(level) {
 | 2 | 4-6 | +Triangle | +Blue | None |
 | 3 | 7-9 | +Star, +Heart | +Green, +Yellow | None |
 | 4 | 10-12 | +Pentagon, +Hexagon | +Purple, +Orange | Small/Large |
-| 5 | 13+ | +Diamond (8 total) | +Pink, +Cyan, +Brown, +Lime (10 total) | Small/Large |
+| 5 | 13+ | +Diamond (8 total) | +Pink, +Cyan (8 colors total) | Small/Large |
 
-### Slot Count Progression
+### Slot / inventory progression
 
-```javascript
-function getSlotCount(tier) {
-    switch (tier) {
-        case 1: return 2;  // 2 slots
-        case 2: return 3;  // 3 slots
-        case 3: return 4;  // 4 slots
-        case 4: return 5;  // 5 slots (introduces size)
-        default: return 6; // 6 slots (full difficulty)
-    }
-}
-```
+Driven by `TIER_CONFIG` in `src/constants.js` (not old `getSlotCount` helper):
+
+| Tier | Targets | Inventory | Size |
+|------|---------|-----------|------|
+| 1 | 1 | 3 | off |
+| 2 | 2 | 4 | off |
+| 3 | 2–3 | 5 | off |
+| 4 | 3 | 6 | on |
+| Endless | 2–4 | 4–8 | 50% chance |
 
 ## Drag-and-Drop System
 
@@ -165,16 +163,9 @@ function validateMatch(item, slot) {
 
 Every 3 levels, players get break with mini-game. Prevent fatigue, add variety.
 
-### Mini-Game Rotation
+### Mini-Game Selection
 
-```javascript
-const INTERMISSION_FREQUENCY = 3;
-const minigames = ['mud-wash', 'sticker-shop', 'big-jump', 'bubble-wrap'];
-
-function getNextMinigame(intermissionCount) {
-    return minigames[intermissionCount % minigames.length];
-}
-```
+Every `INTERMISSION_FREQUENCY` levels. Pick via `Math.random()` among mud-wash, sticker-shop, big-jump, bubble-wrap (`visual-effects.js` `triggerIntermission`).
 
 ### Mini-Game Descriptions
 
@@ -200,17 +191,9 @@ function getNextMinigame(intermissionCount) {
 
 ## State Management
 
-### Immutable State Pattern
+### Mutable singleton
 
-All state changes create new objects. No mutate existing.
-
-```javascript
-// ❌ Bad: Mutation
-gameState.levelCount++;
-
-// ✅ Good: Immutability
-gameState = { ...gameState, levelCount: gameState.levelCount + 1 };
-```
+`gameState` in `src/state.js` mutated in place by modules (drag-drop, levels, match-validation, visual-effects). Not immutable. Keep mutations localized; avoid circular import traps (`drag-drop` ↔ `match-validation` still coupled via live bindings).
 
 ### State Structure
 

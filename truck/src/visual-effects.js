@@ -61,6 +61,7 @@ export function hideCelebrationOverlay() {
  */
 export function createFireworks() {
     const container = document.getElementById('fireworks-container');
+    if (!container) return;
     clearContainer(container);
 
     const colors = ['#FF4444', '#4444FF', '#44FF44', '#FFFF44', '#AA44FF', '#FF8844'];
@@ -69,15 +70,22 @@ export function createFireworks() {
         const firework = document.createElement('div');
         firework.className = 'firework';
 
-        // Random position around center
+        // Spawn near center; explode outward via --tx/--ty (px) used by @keyframes explode
         const angle = Math.random() * Math.PI * 2;
-        const distance = FIREWORK_DISTANCE_MIN + Math.random() * (FIREWORK_DISTANCE_MAX - FIREWORK_DISTANCE_MIN);
+        const distance =
+            FIREWORK_DISTANCE_MIN +
+            Math.random() * (FIREWORK_DISTANCE_MAX - FIREWORK_DISTANCE_MIN);
+        const tx =
+            Math.cos(angle) * distance +
+            (Math.random() - 0.5) * FIREWORK_POSITION_VARIANCE.horizontal;
+        const ty =
+            Math.sin(angle) * distance +
+            (Math.random() - 0.5) * FIREWORK_POSITION_VARIANCE.vertical;
 
-        const x = FIREWORK_POSITION_CENTER.left + Math.cos(angle) * distance + (Math.random() - 0.5) * FIREWORK_POSITION_VARIANCE.horizontal;
-        const y = FIREWORK_POSITION_CENTER.top + Math.sin(angle) * distance + (Math.random() - 0.5) * FIREWORK_POSITION_VARIANCE.vertical;
-
-        firework.style.left = `${x}%`;
-        firework.style.top = `${y}%`;
+        firework.style.left = `${FIREWORK_POSITION_CENTER.left}%`;
+        firework.style.top = `${FIREWORK_POSITION_CENTER.top}%`;
+        firework.style.setProperty('--tx', `${tx}px`);
+        firework.style.setProperty('--ty', `${ty}px`);
         firework.style.background = colors[Math.floor(Math.random() * colors.length)];
         firework.style.animationDelay = `${Math.random() * 0.5}s`;
 

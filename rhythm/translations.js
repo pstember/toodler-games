@@ -156,6 +156,7 @@ export function translate(key) {
 }
 
 export function setLanguage(lang) {
+  if (lang !== 'en' && lang !== 'fr' && lang !== 'es') return;
   currentLanguage = lang;
   saveLanguagePreference(lang);
   try {
@@ -163,6 +164,7 @@ export function setLanguage(lang) {
   } catch {
     /* ignore */
   }
+  document.documentElement.lang = lang;
 
   const table = translations[lang] || translations.en;
 

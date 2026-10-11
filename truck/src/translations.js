@@ -100,6 +100,7 @@ export function getCurrentLanguage() {
 }
 
 export function setLanguage(lang) {
+    if (lang !== 'en' && lang !== 'fr' && lang !== 'es') return;
     currentLanguage = lang;
     saveLanguagePreference(lang);
     // Also update legacy key for backwards compatibility
@@ -108,6 +109,7 @@ export function setLanguage(lang) {
     } catch {
         /* ignore */
     }
+    document.documentElement.lang = lang;
 
     const table = translations[lang] || translations.en;
 
