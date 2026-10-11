@@ -29,6 +29,10 @@ vi.mock('../../src/minigames/bubble-wrap.js', () => ({
   startBubbleWrapGame: vi.fn()
 }));
 
+vi.mock('../../src/minigames/fuel-up.js', () => ({
+  startFuelUpGame: vi.fn()
+}));
+
 vi.mock('../../src/levels.js', () => ({
   generateLevel: vi.fn()
 }));

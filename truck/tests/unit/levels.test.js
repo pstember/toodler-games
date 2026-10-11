@@ -4,7 +4,8 @@ import {
   getUnlockedColors,
   generateLevel,
   createSlot,
-  createDraggableItem
+  createDraggableItem,
+  createNearMissDistractor
 } from '../../src/levels.js';
 import { gameState, ALL_SHAPES, ALL_COLORS } from '../../src/state.js';
 
@@ -26,69 +27,120 @@ describe('Level Generation', () => {
   });
 
   describe('getUnlockedShapes', () => {
-    it('returns 2 shapes for tier 1 (levels 1-3)', () => {
+    it('returns 2 shapes for tier 1 (levels 1-2)', () => {
       expect(getUnlockedShapes(1)).toEqual(['circle', 'square']);
       expect(getUnlockedShapes(2)).toEqual(['circle', 'square']);
-      expect(getUnlockedShapes(3)).toEqual(['circle', 'square']);
     });
 
-    it('returns 3 shapes for tier 2 (levels 4-6)', () => {
-      expect(getUnlockedShapes(4)).toEqual(['circle', 'square', 'triangle']);
+    it('returns 3 shapes for tier 2 (levels 3-5)', () => {
+      expect(getUnlockedShapes(3)).toEqual(['circle', 'square', 'triangle']);
       expect(getUnlockedShapes(5)).toEqual(['circle', 'square', 'triangle']);
-      expect(getUnlockedShapes(6)).toEqual(['circle', 'square', 'triangle']);
     });
 
-    it('returns 5 shapes for tier 3 (levels 7-9)', () => {
+    it('returns 5 shapes for tier 3 (levels 6-8)', () => {
       const tier3Shapes = ['circle', 'square', 'triangle', 'star', 'heart'];
-      expect(getUnlockedShapes(7)).toEqual(tier3Shapes);
+      expect(getUnlockedShapes(6)).toEqual(tier3Shapes);
       expect(getUnlockedShapes(8)).toEqual(tier3Shapes);
-      expect(getUnlockedShapes(9)).toEqual(tier3Shapes);
     });
 
-    it('returns 7 shapes for tier 4 (levels 10-12)', () => {
+    it('returns 7 shapes for tier 4 (levels 9-11)', () => {
       const tier4Shapes = ['circle', 'square', 'triangle', 'star', 'heart', 'pentagon', 'hexagon'];
-      expect(getUnlockedShapes(10)).toEqual(tier4Shapes);
+      expect(getUnlockedShapes(9)).toEqual(tier4Shapes);
       expect(getUnlockedShapes(11)).toEqual(tier4Shapes);
-      expect(getUnlockedShapes(12)).toEqual(tier4Shapes);
     });
 
-    it('returns all 8 shapes for endless (level 13+)', () => {
-      expect(getUnlockedShapes(13)).toEqual(ALL_SHAPES);
+    it('returns all 8 shapes for endless (level 12+)', () => {
+      expect(getUnlockedShapes(12)).toEqual(ALL_SHAPES);
       expect(getUnlockedShapes(20)).toEqual(ALL_SHAPES);
       expect(getUnlockedShapes(100)).toEqual(ALL_SHAPES);
     });
   });
 
   describe('getUnlockedColors', () => {
-    it('returns 1 color for tier 1 (levels 1-3)', () => {
+    it('returns 1 color for tier 1 (levels 1-2)', () => {
       expect(getUnlockedColors(1)).toEqual(['red']);
       expect(getUnlockedColors(2)).toEqual(['red']);
-      expect(getUnlockedColors(3)).toEqual(['red']);
     });
 
-    it('returns 2 colors for tier 2 (levels 4-6)', () => {
-      expect(getUnlockedColors(4)).toEqual(['red', 'blue']);
+    it('returns 2 colors for tier 2 (levels 3-5)', () => {
+      expect(getUnlockedColors(3)).toEqual(['red', 'blue']);
       expect(getUnlockedColors(5)).toEqual(['red', 'blue']);
-      expect(getUnlockedColors(6)).toEqual(['red', 'blue']);
     });
 
-    it('returns 4 colors for tier 3 (levels 7-9)', () => {
+    it('returns 4 colors for tier 3 (levels 6-8)', () => {
       const tier3Colors = ['red', 'blue', 'green', 'yellow'];
-      expect(getUnlockedColors(7)).toEqual(tier3Colors);
+      expect(getUnlockedColors(6)).toEqual(tier3Colors);
       expect(getUnlockedColors(8)).toEqual(tier3Colors);
-      expect(getUnlockedColors(9)).toEqual(tier3Colors);
     });
 
-    it('returns 6 colors for tier 4 (levels 10-12)', () => {
+    it('returns 6 colors for tier 4 (levels 9-11)', () => {
       const tier4Colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
-      expect(getUnlockedColors(10)).toEqual(tier4Colors);
+      expect(getUnlockedColors(9)).toEqual(tier4Colors);
       expect(getUnlockedColors(11)).toEqual(tier4Colors);
-      expect(getUnlockedColors(12)).toEqual(tier4Colors);
     });
 
-    it('returns all 8 colors for endless (level 13+)', () => {
-      expect(getUnlockedColors(13)).toEqual(ALL_COLORS);
+    it('returns all 8 colors for endless (level 12+)', () => {
+      expect(getUnlockedColors(12)).toEqual(ALL_COLORS);
       expect(getUnlockedColors(25)).toEqual(ALL_COLORS);
+    });
+  });
+
+  describe('createNearMissDistractor', () => {
+    it('shares shape or color with a slot requirement', () => {
+      const slotReqs = [{ shape: 'circle', color: 'red', size: 'large' }];
+      const distractor = createNearMissDistractor(
+        slotReqs,
+        ['circle', 'square'],
+        ['red', 'blue'],
+        false,
+        [...slotReqs]
+      );
+
+      expect(distractor).toBeTruthy();
+      expect(
+        distractor.shape === 'circle' || distractor.color === 'red'
+      ).toBe(true);
+      expect(
+        distractor.shape === 'circle' && distractor.color === 'red'
+      ).toBe(false);
+    });
+
+    it('avoids duplicating existing inventory items', () => {
+      const slotReqs = [{ shape: 'circle', color: 'red', size: 'large' }];
+      const existing = [
+        ...slotReqs,
+        { shape: 'circle', color: 'blue', size: 'large' },
+        { shape: 'square', color: 'red', size: 'large' }
+      ];
+
+      // Only 2 shapes × 2 colors = 4 combos; all used except square-blue
+      const distractor = createNearMissDistractor(
+        slotReqs,
+        ['circle', 'square'],
+        ['red', 'blue'],
+        false,
+        existing
+      );
+
+      expect(distractor).toEqual({ shape: 'square', color: 'blue', size: 'large' });
+    });
+
+    it('returns null when no unique distractor possible', () => {
+      const slotReqs = [{ shape: 'circle', color: 'red', size: 'large' }];
+      const existing = [
+        { shape: 'circle', color: 'red', size: 'large' },
+        { shape: 'square', color: 'red', size: 'large' }
+      ];
+
+      const distractor = createNearMissDistractor(
+        slotReqs,
+        ['circle', 'square'],
+        ['red'],
+        false,
+        existing
+      );
+
+      expect(distractor).toBeNull();
     });
   });
 
@@ -105,21 +157,20 @@ describe('Level Generation', () => {
       expect(gameState.slots.length).toBe(2);
     });
 
-    it('generates 2-3 slots for tier 3', () => {
+    it('generates 3 slots for tier 3', () => {
       generateLevel(7, mockDragHandler);
-      expect(gameState.slots.length).toBeGreaterThanOrEqual(2);
-      expect(gameState.slots.length).toBeLessThanOrEqual(3);
-    });
-
-    it('generates exactly 3 slots for tier 4', () => {
-      generateLevel(10, mockDragHandler);
       expect(gameState.slots.length).toBe(3);
     });
 
-    it('generates 2-4 slots for endless mode', () => {
-      generateLevel(13, mockDragHandler);
-      expect(gameState.slots.length).toBeGreaterThanOrEqual(2);
-      expect(gameState.slots.length).toBeLessThanOrEqual(4);
+    it('generates exactly 4 slots for tier 4', () => {
+      generateLevel(10, mockDragHandler);
+      expect(gameState.slots.length).toBe(4);
+    });
+
+    it('generates 4-5 slots for endless mode', () => {
+      generateLevel(12, mockDragHandler);
+      expect(gameState.slots.length).toBeGreaterThanOrEqual(4);
+      expect(gameState.slots.length).toBeLessThanOrEqual(5);
     });
 
     it('creates inventory with correct matches for all slots', () => {

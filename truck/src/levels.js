@@ -18,15 +18,15 @@ import { clearContainer, shuffleArray } from './utils.js';
  */
 export function getUnlockedShapes(level) {
     if (level <= TIER_THRESHOLDS.TIER_1) {
-        return ['circle', 'square']; // Tier 1: 2 shapes
+        return ['circle', 'square']; // Tier 1 (1-2): 2 shapes
     } else if (level <= TIER_THRESHOLDS.TIER_2) {
-        return ['circle', 'square', 'triangle']; // Tier 2: 3 shapes
+        return ['circle', 'square', 'triangle']; // Tier 2 (3-5): 3 shapes
     } else if (level <= TIER_THRESHOLDS.TIER_3) {
-        return ['circle', 'square', 'triangle', 'star', 'heart']; // Tier 3: 5 shapes
+        return ['circle', 'square', 'triangle', 'star', 'heart']; // Tier 3 (6-8): 5 shapes
     } else if (level <= TIER_THRESHOLDS.TIER_4) {
-        return ['circle', 'square', 'triangle', 'star', 'heart', 'pentagon', 'hexagon']; // Tier 4: 7 shapes
+        return ['circle', 'square', 'triangle', 'star', 'heart', 'pentagon', 'hexagon']; // Tier 4 (9-11): 7 shapes
     } else {
-        return ALL_SHAPES; // Endless: all 8 shapes
+        return ALL_SHAPES; // Endless (12+): all 8 shapes
     }
 }
 
@@ -37,15 +37,15 @@ export function getUnlockedShapes(level) {
  */
 export function getUnlockedColors(level) {
     if (level <= TIER_THRESHOLDS.TIER_1) {
-        return ['red']; // Tier 1: 1 color
+        return ['red']; // Tier 1 (1-2): 1 color
     } else if (level <= TIER_THRESHOLDS.TIER_2) {
-        return ['red', 'blue']; // Tier 2: 2 colors
+        return ['red', 'blue']; // Tier 2 (3-5): 2 colors
     } else if (level <= TIER_THRESHOLDS.TIER_3) {
-        return ['red', 'blue', 'green', 'yellow']; // Tier 3: 4 colors
+        return ['red', 'blue', 'green', 'yellow']; // Tier 3 (6-8): 4 colors
     } else if (level <= TIER_THRESHOLDS.TIER_4) {
-        return ['red', 'blue', 'green', 'yellow', 'purple', 'orange']; // Tier 4: 6 colors
+        return ['red', 'blue', 'green', 'yellow', 'purple', 'orange']; // Tier 4 (9-11): 6 colors
     } else {
-        return ALL_COLORS; // Endless: all 8 colors (includes pink, cyan)
+        return ALL_COLORS; // Endless (12+): all 8 colors (includes pink, cyan)
     }
 }
 
@@ -194,7 +194,68 @@ function generateSlotRequirements(numTargets, shapes, colors, useSize) {
 }
 
 /**
- * Generates inventory items (correct matches + distractors)
+ * Build a near-miss distractor that shares shape or color with a slot.
+ * Makes wrong picks feel close so matching stays engaging longer.
+ * @param {Object[]} slotReqs - Slot requirements to almost-match
+ * @param {string[]} shapes - Available shapes
+ * @param {string[]} colors - Available colors
+ * @param {boolean} useSize - Whether to vary size
+ * @param {Object[]} existingItems - Items already in inventory (avoid dupes)
+ * @returns {Object|null} Distractor item or null if none found
+ */
+export function createNearMissDistractor(slotReqs, shapes, colors, useSize, existingItems = []) {
+    if (!slotReqs.length || !shapes.length || !colors.length) {
+        return null;
+    }
+
+    const sizes = useSize ? ['large', 'small'] : ['large'];
+
+    const isTaken = (candidate) =>
+        existingItems.some(item =>
+            item.shape === candidate.shape &&
+            item.color === candidate.color &&
+            item.size === candidate.size
+        ) ||
+        slotReqs.some(req =>
+            req.shape === candidate.shape &&
+            req.color === candidate.color &&
+            req.size === candidate.size
+        );
+
+    const nearMissCandidates = [];
+    const otherCandidates = [];
+
+    for (const shape of shapes) {
+        for (const color of colors) {
+            for (const size of sizes) {
+                const candidate = { shape, color, size };
+                if (isTaken(candidate)) continue;
+
+                const isNearMiss = slotReqs.some(req =>
+                    (req.shape === shape && req.color !== color) ||
+                    (req.color === color && req.shape !== shape) ||
+                    (useSize && req.shape === shape && req.color === color && req.size !== size)
+                );
+
+                if (isNearMiss) {
+                    nearMissCandidates.push(candidate);
+                } else {
+                    otherCandidates.push(candidate);
+                }
+            }
+        }
+    }
+
+    const pool = nearMissCandidates.length > 0 ? nearMissCandidates : otherCandidates;
+    if (pool.length === 0) {
+        return null;
+    }
+
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/**
+ * Generates inventory items (correct matches + near-miss distractors)
  * @param {Object[]} slotReqs - Slot requirements
  * @param {number} numInventory - Total inventory size
  * @param {string[]} shapes - Available shapes
@@ -214,32 +275,19 @@ function generateInventoryItems(slotReqs, numInventory, shapes, colors, useSize)
     const safeSize = Math.min(numInventory, maxUnique);
     const numDistractors = safeSize - slotReqs.length;
 
-    // Add distractors
-    const maxAttempts = 100;
     for (let i = 0; i < numDistractors; i++) {
-        let distractor;
-        let attempts = 0;
+        const distractor = createNearMissDistractor(
+            slotReqs,
+            shapes,
+            colors,
+            useSize,
+            items
+        );
 
-        do {
-            distractor = {
-                shape: shapes[Math.floor(Math.random() * shapes.length)],
-                color: colors[Math.floor(Math.random() * colors.length)],
-                size: useSize ? (Math.random() > 0.5 ? 'large' : 'small') : 'large'
-            };
-            attempts++;
-
-            if (attempts >= maxAttempts) {
-                console.error('Failed to generate unique distractor - skipping');
-                break;
-            }
-        } while (items.some(item =>
-            item.shape === distractor.shape &&
-            item.color === distractor.color &&
-            item.size === distractor.size
-        ));
-
-        if (attempts < maxAttempts) {
+        if (distractor) {
             items.push(distractor);
+        } else {
+            break;
         }
     }
 

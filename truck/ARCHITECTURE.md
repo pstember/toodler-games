@@ -47,14 +47,14 @@ Game use tier-based progression. Gradual complexity increase.
 ### Tier Algorithm
 
 ```javascript
-const TIER_THRESHOLDS = [3, 6, 9, 12];
+const TIER_THRESHOLDS = [2, 5, 8, 11];
 
 function getTier(level) {
-    if (level <= TIER_THRESHOLDS[0]) return 1;  // Levels 1-3
-    if (level <= TIER_THRESHOLDS[1]) return 2;  // Levels 4-6
-    if (level <= TIER_THRESHOLDS[2]) return 3;  // Levels 7-9
-    if (level <= TIER_THRESHOLDS[3]) return 4;  // Levels 10-12
-    return 5;                                    // Level 13+
+    if (level <= TIER_THRESHOLDS[0]) return 1;  // Levels 1-2
+    if (level <= TIER_THRESHOLDS[1]) return 2;  // Levels 3-5
+    if (level <= TIER_THRESHOLDS[2]) return 3;  // Levels 6-8
+    if (level <= TIER_THRESHOLDS[3]) return 4;  // Levels 9-11
+    return 5;                                    // Level 12+
 }
 ```
 
@@ -62,25 +62,27 @@ function getTier(level) {
 
 | Tier | Levels | Shapes | Colors | Size Variation |
 |------|--------|--------|--------|----------------|
-| 1 | 1-3 | Circle, Square | Red | None |
-| 2 | 4-6 | +Triangle | +Blue | None |
-| 3 | 7-9 | +Star, +Heart | +Green, +Yellow | None |
-| 4 | 10-12 | +Pentagon, +Hexagon | +Purple, +Orange | Small/Large |
-| 5 | 13+ | +Diamond (8 total) | +Pink, +Cyan, +Brown, +Lime (10 total) | Small/Large |
+| 1 | 1-2 | Circle, Square | Red | None |
+| 2 | 3-5 | +Triangle | +Blue | None |
+| 3 | 6-8 | +Star, +Heart | +Green, +Yellow | None |
+| 4 | 9-11 | +Pentagon, +Hexagon | +Purple, +Orange | Small/Large |
+| 5 | 12+ | +Diamond (8 total) | +Pink, +Cyan (8 total) | Small/Large (often) |
 
 ### Slot Count Progression
 
 ```javascript
 function getSlotCount(tier) {
     switch (tier) {
-        case 1: return 2;  // 2 slots
-        case 2: return 3;  // 3 slots
-        case 3: return 4;  // 4 slots
-        case 4: return 5;  // 5 slots (introduces size)
-        default: return 6; // 6 slots (full difficulty)
+        case 1: return 1;  // 1 slot (gentle start)
+        case 2: return 2;  // 2 slots
+        case 3: return 3;  // 3 slots
+        case 4: return 4;  // 4 slots + size
+        default: return 4-5; // Endless stays hard
     }
 }
 ```
+
+Distractors prefer near-misses (same shape wrong color, or same color wrong shape).
 
 ## Drag-and-Drop System
 
@@ -169,7 +171,7 @@ Every 3 levels, players get break with mini-game. Prevent fatigue, add variety.
 
 ```javascript
 const INTERMISSION_FREQUENCY = 3;
-const minigames = ['mud-wash', 'sticker-shop', 'big-jump', 'bubble-wrap'];
+const minigames = ['mud-wash', 'sticker-shop', 'big-jump', 'bubble-wrap', 'fuel-up'];
 
 function getNextMinigame(intermissionCount) {
     return minigames[intermissionCount % minigames.length];
@@ -197,6 +199,11 @@ function getNextMinigame(intermissionCount) {
    - Grid of bubbles to pop
    - Responsive grid sizing (mobile vs desktop)
    - Complete when all bubbles popped
+
+5. **Fuel Up** (Tap fill):
+   - Tap PUMP to fill tank meter
+   - Each tap adds fixed fill amount
+   - Truck drives off when tank full
 
 ## State Management
 

@@ -7,7 +7,7 @@ Colorful drag-drop matching game for 3-year-olds.
 - **Progressive Difficulty:** Shapes and colors unlock gradually across 4 tiers
 - **Positive Reinforcement:** No timers, no fail states, only celebrations
 - **Touch-Friendly:** Massive touch targets for tiny fingers
-- **Intermission Mini-Games:** Fun breaks every 3 levels (Mud Wash, Sticker Shop, Big Jump)
+- **Intermission Mini-Games:** Fun breaks every 3 levels (Mud Wash, Sticker Shop, Big Jump, Bubble Wrap, Fuel Up)
 - **Zero Dependencies:** Pure HTML/CSS/JavaScript, no external images
 - **Theme & Language Sync:** Preferences shared with hub and puzzle via `../shared/` utilities
 
@@ -32,11 +32,11 @@ In monorepo, run `npx serve .` from repo root and open hub, choose **Monster Tru
 
 ## Game Structure
 
-- **Levels 1-3:** Basic shape matching (Circle, Square)
-- **Levels 4-6:** Shape + color matching (adds Triangle, Blue)
-- **Levels 7-9:** Expanded palette (adds Star, Heart, Green, Yellow)
-- **Levels 10-12:** Size sorting (adds Pentagon, Hexagon, Purple, Orange)
-- **Level 13+:** Endless mode with full palette (8 shapes, 8 colors)
+- **Levels 1-2:** Basic shape matching (Circle, Square)
+- **Levels 3-5:** Shape + color matching (adds Triangle, Blue)
+- **Levels 6-8:** Expanded palette (adds Star, Heart, Green, Yellow)
+- **Levels 9-11:** Size sorting (adds Pentagon, Hexagon, Purple, Orange)
+- **Level 12+:** Endless mode with full palette (8 shapes, 8 colors)
 
 ### Full Shape & Color Palette
 
@@ -66,6 +66,14 @@ or ?minigame=stickers
 # Big Jump Game
 ?minigame=big-jump
 or ?minigame=jump
+
+# Bubble Wrap Game
+?minigame=bubble-wrap
+or ?minigame=bubbles
+
+# Fuel Up Game
+?minigame=fuel-up
+or ?minigame=fuel
 ```
 
 **Examples:**

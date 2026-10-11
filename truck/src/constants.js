@@ -29,12 +29,13 @@ export const FIREWORK_CLEANUP_DELAY = 2000;
 // ===================================
 
 // Tier thresholds define when players advance to next difficulty tier
+// Compressed so challenge arrives sooner (was 3/6/9/12)
 export const TIER_THRESHOLDS = {
-    TIER_1: 3,   // Levels 1-3
-    TIER_2: 6,   // Levels 4-6
-    TIER_3: 9,   // Levels 7-9
-    TIER_4: 12   // Levels 10-12
-    // Level 13+ is endless mode with all features unlocked
+    TIER_1: 2,   // Levels 1-2
+    TIER_2: 5,   // Levels 3-5
+    TIER_3: 8,   // Levels 6-8
+    TIER_4: 11   // Levels 9-11
+    // Level 12+ is endless mode with all features unlocked
 };
 
 // How many levels before an intermission mini-game
@@ -42,6 +43,10 @@ export const INTERMISSION_FREQUENCY = 3;
 
 // Mud wash completion threshold (percentage)
 export const MUD_WASH_COMPLETION_THRESHOLD = 99;
+
+// Fuel-up mini-game: each pump tap fills this much of the tank
+export const FUEL_PUMP_FILL_AMOUNT = 12;
+export const FUEL_TANK_FULL = 100;
 
 // ===================================
 // RESPONSIVE BREAKPOINTS (pixels)
@@ -76,6 +81,7 @@ export const BUBBLE_GRID_DEFAULT = {
 // ===================================
 
 // Number of targets and inventory items per tier
+// Higher target/inventory counts + earlier size keep mid-game from feeling trivial
 export const TIER_CONFIG = {
     TIER_1: {
         numTargets: 1,
@@ -84,26 +90,27 @@ export const TIER_CONFIG = {
     },
     TIER_2: {
         numTargets: 2,
-        numInventory: 4,
-        useSize: false
-    },
-    TIER_3: {
-        numTargetsMin: 2,
-        numTargetsMax: 3,
         numInventory: 5,
         useSize: false
     },
-    TIER_4: {
-        numTargets: 3,
+    TIER_3: {
+        numTargetsMin: 3,
+        numTargetsMax: 3,
         numInventory: 6,
+        useSize: false
+    },
+    TIER_4: {
+        numTargets: 4,
+        numInventory: 7,
         useSize: true
     },
     ENDLESS: {
-        numTargetsMin: 2,
-        numTargetsMax: 4,
-        numInventoryMin: 4,
-        numInventoryMax: 8,
-        useSizeChance: 0.5
+        numTargetsMin: 4,
+        numTargetsMax: 5,
+        numInventoryMin: 7,
+        numInventoryMax: 9,
+        // useSize when Math.random() > useSizeChance → lower = size more often
+        useSizeChance: 0.25
     }
 };
 
