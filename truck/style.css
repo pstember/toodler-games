@@ -1248,7 +1248,8 @@ html[data-theme="dark"] .level-display {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: var(--bg-color);
+    /* Solid panel so arena art doesn't bleed through mini-games */
+    background: linear-gradient(165deg, #1e3a5f 0%, #2d5a87 45%, #3d7ab0 100%);
     z-index: 10000;
 }
 
