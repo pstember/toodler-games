@@ -33,6 +33,19 @@ describe('Shape visual assets', () => {
       expect(styleCss).not.toMatch(/\.size-small\.heart::before\s*,\s*\.size-small\.heart::after\s*\{[^}]*display:\s*none/s);
       expect(styleCss).toMatch(/\.size-small\.heart::after\s*\{[^}]*background-size:\s*185%/s);
     });
+
+    it('triangle rim fill scales with % clip-path (not fixed border px)', () => {
+      // Fixed border-left/right/bottom px overflowed the tire hole at large + small
+      const triangleBefore = styleCss.match(/\.triangle::before\s*\{[^}]+\}/s)?.[0] ?? '';
+      expect(triangleBefore).toMatch(/width:\s*\d+%/);
+      expect(triangleBefore).toMatch(/height:\s*\d+%/);
+      expect(triangleBefore).toMatch(/clip-path:\s*polygon\(/);
+      expect(triangleBefore).not.toMatch(/border-(left|right|bottom):\s*\d+px/);
+      expect(styleCss).not.toMatch(/\.size-small\.triangle::before\s*\{[^}]*border-left:\s*\d+px/s);
+      expect(styleCss).toMatch(
+        /\.size-small\.(?:circle|square|hexagon|star|triangle)::before[\s\S]*?scale\(0\.8\)/
+      );
+    });
   });
 
   describe('tire PNG files exist', () => {

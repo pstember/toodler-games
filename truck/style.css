@@ -823,18 +823,22 @@ html[data-theme="dark"] .level-display {
     pointer-events: none;
 }
 
-/* Triangle - triangular solid color */
+/*
+ * Triangle rim fill: %-based clip-path (same pattern as star/hexagon).
+ * Fixed border-triangles (80×69px) were larger than the tire hole (~52×48
+ * at 120px) and bled past the silver rim, especially at the base / small size.
+ */
 .triangle::before {
     content: '';
     position: absolute;
-    top: 51%;
-    left: 52%;
+    /* Base sits at hole widest (~y76), not tapered tip-bottom (~y82) */
+    top: 47%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    width: 0;
-    height: 0;
-    border-left: 40px solid transparent;
-    border-right: 40px solid transparent;
-    border-bottom: 69px solid var(--rim-color);
+    width: 38%;
+    height: 34%;
+    background: var(--rim-color);
+    clip-path: polygon(50% 6%, 92% 94%, 8% 94%);
     z-index: 1;
     pointer-events: none;
 }
@@ -1098,7 +1102,8 @@ html[data-theme="dark"] .level-display {
 .size-small.circle::before,
 .size-small.square::before,
 .size-small.hexagon::before,
-.size-small.star::before {
+.size-small.star::before,
+.size-small.triangle::before {
     transform: translate(-50%, -50%) scale(0.8);
 }
 
@@ -1116,13 +1121,6 @@ html[data-theme="dark"] .level-display {
 /* Diamond needs to preserve rotation */
 .size-small.diamond::before {
     transform: translate(-50%, -50%) rotate(45deg) scale(0.8);
-}
-
-/* Triangle uses fixed pixels, needs specific scaling */
-.size-small.triangle::before {
-    border-left: 32px solid transparent;
-    border-right: 32px solid transparent;
-    border-bottom: 55px solid var(--rim-color);
 }
 
 /* Color Classes - Set rim colors for tires */
