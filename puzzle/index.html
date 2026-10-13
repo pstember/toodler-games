@@ -110,7 +110,7 @@
       flex-shrink: 0;
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: var(--chrome-gap);
       justify-content: center;
       align-items: center;
       padding: 14px 16px;
@@ -122,14 +122,15 @@
     }
 
     .btn {
-      min-width: 48px;
-      min-height: 48px;
-      padding: var(--space-sm) var(--space-lg);
+      box-sizing: border-box;
+      min-width: var(--chrome-min-h);
+      min-height: var(--chrome-min-h);
+      padding: var(--chrome-pad-y) var(--chrome-pad-x);
       border: none;
-      border-radius: var(--radius-md);
+      border-radius: var(--chrome-radius);
       font-family: var(--font-family);
-      font-size: 17px;
-      font-weight: 700;
+      font-size: var(--chrome-font);
+      font-weight: var(--chrome-font-weight);
       letter-spacing: 0.01em;
       cursor: pointer;
       touch-action: manipulation;
@@ -198,7 +199,7 @@
       appearance: none;
       cursor: pointer;
       color: #fff;
-      padding-right: 38px;
+      padding-right: var(--chrome-pad-x-end);
       background-image:
         linear-gradient(180deg, #22c55e 0%, #15803d 100%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
@@ -218,7 +219,7 @@
       appearance: none;
       cursor: pointer;
       color: #fff;
-      padding-right: 38px;
+      padding-right: var(--chrome-pad-x-end);
       background-image:
         linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
@@ -238,7 +239,7 @@
       appearance: none;
       cursor: pointer;
       color: #fff;
-      padding-right: 38px;
+      padding-right: var(--chrome-pad-x-end);
       background-image:
         linear-gradient(180deg, #64748b 0%, #334155 100%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
@@ -258,15 +259,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 48px;
-      padding: 10px 16px;
-      border-radius: 16px;
-      font-size: 16px;
+      box-sizing: border-box;
+      min-height: var(--chrome-min-h);
+      padding: var(--chrome-pad-y) var(--chrome-pad-x);
+      border-radius: var(--chrome-radius);
+      font-size: var(--chrome-font);
       font-weight: 600;
+      font-family: var(--font-family);
       text-decoration: none;
       color: var(--play-ink);
       background: rgba(255, 255, 255, 0.75);
-      border: 3px solid rgba(255, 255, 255, 0.95);
+      border: var(--chrome-border) solid rgba(255, 255, 255, 0.95);
       box-shadow: var(--play-shadow-soft), var(--play-shadow-inset);
       transition: transform 0.08s ease, filter 0.12s ease;
     }
@@ -668,16 +671,10 @@
 
     @media (max-width: 600px) {
       #menu-bar {
-        gap: 8px;
+        gap: var(--chrome-gap);
         padding: 8px;
       }
-
-      .btn {
-        font-size: 16px;
-        padding: 10px 16px;
-        min-width: 44px;
-        min-height: 44px;
-      }
+      /* Geometry comes from shared --chrome-* (≤640px); keep puzzle paint only */
     }
 
     @media (orientation: landscape) and (max-height: 600px) {

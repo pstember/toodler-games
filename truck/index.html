@@ -34,12 +34,15 @@
 </head>
 <body role="application" aria-label="Monster Truck Match Game">
     <div class="top-nav">
+        <div id="level-display" class="game-chrome game-chrome--status level-display" role="status" aria-live="polite" aria-atomic="true">
+            <span data-i18n="level">Level</span> <span id="level-number">1</span>
+        </div>
         <div class="top-nav__right">
-            <a class="hub-link" href="../index.html" data-i18n="more-games">More games</a>
+            <a class="game-chrome game-chrome--primary hub-link" href="../index.html" data-i18n="more-games">More games</a>
             <label for="theme-select" class="sr-only">Theme</label>
             <select
                 id="theme-select"
-                class="theme-select"
+                class="game-chrome game-chrome--secondary theme-select"
                 data-i18n-aria="theme-aria"
                 data-i18n-title="theme-title"
                 aria-label="Display theme"
@@ -51,7 +54,7 @@
             </select>
             <div class="language-selector">
                 <label for="language-select" class="sr-only">Select Language</label>
-                <select id="language-select" aria-label="Choose game language">
+                <select id="language-select" class="game-chrome game-chrome--accent" aria-label="Choose game language">
                     <option value="en">🇬🇧 English</option>
                     <option value="fr">🇧🇪 Français</option>
                     <option value="es">🇪🇨 Español</option>
@@ -72,11 +75,6 @@
 
     <!-- Main Game Container -->
     <main id="game-container" class="hidden" role="main" aria-label="Game play area">
-
-        <!-- Level Counter (hidden but tracked) -->
-        <div id="level-display" class="level-display" role="status" aria-live="polite" aria-atomic="true">
-            <span data-i18n="level">Level</span> <span id="level-number">1</span>
-        </div>
 
         <!-- Truck Area (Top 60%) -->
         <div id="truck-area" class="truck-area">

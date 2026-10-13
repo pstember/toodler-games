@@ -142,10 +142,10 @@ body:has(#splash-screen:not(.hidden)) .top-nav {
     right: 0;
     z-index: 30000;
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
     padding: 12px 16px;
-    gap: 12px;
+    gap: var(--chrome-gap);
     pointer-events: none;
     transition: opacity 0.3s ease;
 }
@@ -155,66 +155,22 @@ body:has(#splash-screen:not(.hidden)) .top-nav {
     pointer-events: auto;
 }
 
+/* Status chip is non-interactive (pointer-events already none on .game-chrome--status) */
+.top-nav .level-display {
+    pointer-events: none;
+}
+
 .top-nav__right {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--chrome-gap);
     flex-wrap: wrap;
     justify-content: flex-end;
+    margin-left: auto;
 }
 
-/* Navigation buttons using unified design system */
 .hub-link {
     text-decoration: none;
-}
-
-.hub-link,
-.theme-select,
-.language-selector select {
-    /* Inherit from .game-btn in shared-design-tokens.css */
-    display: inline-flex;
-    align-items: center;
-    padding: var(--space-sm) var(--space-lg);
-    font-size: 18px;
-    font-weight: 700;
-    font-family: var(--font-family);
-    color: var(--text-inverse);
-    border: 3px solid var(--border-medium);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    box-shadow: var(--shadow-toy), var(--shadow-inset);
-    text-shadow:
-        2px 2px 0px #000000,
-        -1px -1px 0px #000000,
-        1px -1px 0px #000000,
-        -1px 1px 0px #000000;
-    transition: all 0.2s ease;
-    touch-action: manipulation;
-    user-select: none;
-}
-
-.hub-link:hover,
-.theme-select:hover,
-.language-selector select:hover {
-    transform: scale(1.05);
-    box-shadow: var(--shadow-hover), var(--shadow-inset);
-}
-
-.hub-link:active,
-.theme-select:active,
-.language-selector select:active {
-    transform: scale(0.96);
-    box-shadow: var(--shadow-toy-soft), var(--shadow-inset);
-}
-
-/* Individual button colors from design tokens */
-.hub-link {
-    background: var(--btn-primary);
-}
-
-.theme-select {
-    background: var(--btn-secondary);
-    padding-right: 40px; /* Extra space for dropdown arrow */
 }
 
 .theme-select option {
@@ -230,11 +186,7 @@ html[data-theme="dark"] .theme-select option {
 
 .language-selector {
     position: static;
-}
-
-.language-selector select {
-    background: var(--btn-accent);
-    padding-right: 40px; /* Extra space for dropdown arrow */
+    display: inline-flex;
 }
 
 .language-selector select option {
@@ -404,45 +356,31 @@ html[data-theme="dark"] .language-selector select option {
     display: none;
 }
 
+/*
+ * Level chip: shared .game-chrome geometry; truck keeps gold paint.
+ * Lives in .top-nav (left) so it matches hub / theme / lang height.
+ */
 .level-display {
-    position: absolute;
-    top: 72px;
-    left: 20px;
-    font-size: 36px;
-    font-weight: 800;
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    color: #000;
-    padding: var(--space-sm) 28px;
-    border-radius: var(--radius-lg);
-    text-shadow:
-        2px 2px 0px rgba(255,255,255,0.8),
-        3px 3px 0px rgba(0,0,0,0.3);
+    position: static;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    /* Soft gold glow — personality only, not size */
     box-shadow:
         var(--shadow-toy),
-        inset 0 2px 4px rgba(255,255,255,0.5),
-        0 0 20px rgba(255, 215, 0, 0.6);
-    z-index: 10;
-    border: 4px solid #000;
-    animation: levelPulse 2s ease-in-out infinite;
-    font-family: var(--font-family);
-    letter-spacing: 1px;
+        var(--shadow-inset),
+        0 0 16px rgba(255, 215, 0, 0.45);
 }
 
 html[data-theme="dark"] .level-display {
-    background: linear-gradient(135deg, #FDE047 0%, #FACC15 100%);
-    border-color: #1e3a5f;
-    text-shadow:
-        2px 2px 0px rgba(255,255,255,0.6),
-        3px 3px 0px rgba(0,0,0,0.5);
+    box-shadow:
+        var(--shadow-toy),
+        var(--shadow-inset),
+        0 0 14px rgba(250, 204, 21, 0.35);
 }
 
-@keyframes levelPulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
+/* Hide level until gameplay (splash still covers top-nav via opacity) */
+body:has(#game-container.hidden) .level-display {
+    visibility: hidden;
 }
 
 /* ===================================
@@ -1884,13 +1822,6 @@ html[data-theme="dark"] .level-display {
         --tire-large: 100px;
     }
 
-    .level-display {
-        font-size: 28px;
-        padding: 10px 20px;
-        top: 10px;
-        left: 10px;
-    }
-
     .slots-container {
         gap: 20px;
     }
@@ -1905,15 +1836,6 @@ html[data-theme="dark"] .level-display {
 @media (max-width: 768px) {
     :root {
         --tire-large: 65px;
-    }
-
-    .level-display {
-        font-size: 20px;
-        padding: 8px 16px;
-        top: 10px;
-        left: 10px;
-        border-radius: 12px;
-        border: 3px solid #000;
     }
 
     .slots-container {
@@ -2043,11 +1965,6 @@ html[data-theme="dark"] .level-display {
 @media (max-width: 480px) {
     :root {
         --tire-large: 55px;
-    }
-
-    .level-display {
-        font-size: 18px;
-        padding: 6px 12px;
     }
 
     .slots-container {
@@ -2204,11 +2121,6 @@ html[data-theme="dark"] .level-display {
         max-width: 98vw;
     }
 
-    .level-display {
-        font-size: 16px;
-        padding: 5px 10px;
-    }
-
     .canvas-container {
         width: 90vw;
         max-width: 280px;
@@ -2269,10 +2181,6 @@ html[data-theme="dark"] .level-display {
         top: 60%;
     }
 
-    .level-display {
-        font-size: 16px;
-        padding: 4px 10px;
-    }
 }
 
 /* ===================================
