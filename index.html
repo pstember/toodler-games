@@ -73,43 +73,8 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: flex-end;
-      gap: 10px;
+      gap: var(--chrome-gap);
       max-width: calc(100vw - 24px);
-    }
-    .hub-theme,
-    .hub-lang {
-      padding: var(--space-sm) 14px;
-      padding-right: 40px; /* Extra space for dropdown arrow */
-      font-size: 16px;
-      font-weight: 700;
-      font-family: var(--font-family);
-      border-radius: var(--radius-md);
-      border: 3px solid var(--border-medium);
-      cursor: pointer;
-      box-shadow: var(--shadow-toy), var(--shadow-inset);
-      transition: all 0.2s ease;
-      color: var(--text-inverse);
-      text-shadow:
-        2px 2px 0px #000000,
-        -1px -1px 0px #000000,
-        1px -1px 0px #000000,
-        -1px 1px 0px #000000;
-    }
-    .hub-theme {
-      background: var(--btn-secondary);
-    }
-    .hub-lang {
-      background: var(--btn-accent);
-    }
-    .hub-theme:hover,
-    .hub-lang:hover {
-      transform: scale(1.05);
-      box-shadow: var(--shadow-hover), var(--shadow-inset);
-    }
-    .hub-theme:active,
-    .hub-lang:active {
-      transform: scale(0.96);
-      box-shadow: var(--shadow-toy-soft), var(--shadow-inset);
     }
     h1 {
       font-size: clamp(1.75rem, 5vw, 2.5rem);
@@ -188,13 +153,13 @@
 <body>
   <div class="hub-top">
     <label for="hub-theme" class="sr-only" id="hub-theme-label">Theme</label>
-    <select id="hub-theme" class="hub-theme" aria-labelledby="hub-theme-label">
+    <select id="hub-theme" class="game-chrome game-chrome--secondary hub-theme" aria-labelledby="hub-theme-label">
       <option value="system" data-opt="system">🖥️ System</option>
       <option value="light" data-opt="light">☀️ Light</option>
       <option value="dark" data-opt="dark">🌙 Dark</option>
     </select>
     <label for="hub-lang" class="sr-only" id="hub-lang-label">Language</label>
-    <select id="hub-lang" class="hub-lang" aria-labelledby="hub-lang-label">
+    <select id="hub-lang" class="game-chrome game-chrome--accent hub-lang" aria-labelledby="hub-lang-label">
       <option value="en">🇬🇧 English</option>
       <option value="fr">🇧🇪 Français</option>
       <option value="es">🇪🇨 Español</option>

@@ -20,6 +20,20 @@
   --radius-lg: 24px;
   --radius-xl: 30px;
 
+  /*
+   * === TOP CHROME (hub / theme / lang / status) ===
+   * Shared geometry across games. Paint (gradients) stays local.
+   */
+  --chrome-font: 17px;
+  --chrome-font-weight: 700;
+  --chrome-pad-y: 12px;
+  --chrome-pad-x: 16px;
+  --chrome-pad-x-end: 36px; /* selects: room for dropdown arrow */
+  --chrome-border: 3px;
+  --chrome-radius: var(--radius-md);
+  --chrome-min-h: 48px;
+  --chrome-gap: 10px;
+
   /* === SHADOWS - Toy-like depth === */
   --shadow-toy: 0 8px 0 rgba(30, 58, 95, 0.12);
   --shadow-toy-soft: 0 4px 0 rgba(30, 58, 95, 0.08);
@@ -105,18 +119,102 @@ html[data-theme="dark"] {
   --shadow-lifted: 0 12px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* === UNIFIED BUTTON SYSTEM === */
+/* === UNIFIED TOP CHROME === */
+.game-chrome {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--chrome-min-h);
+  padding: var(--chrome-pad-y) var(--chrome-pad-x);
+  font-size: var(--chrome-font);
+  font-weight: var(--chrome-font-weight);
+  font-family: var(--font-family);
+  line-height: 1.2;
+  color: var(--text-inverse);
+  border: var(--chrome-border) solid var(--border-medium);
+  border-radius: var(--chrome-radius);
+  cursor: pointer;
+  box-shadow: var(--shadow-toy), var(--shadow-inset);
+  text-shadow: var(--text-shadow-dark);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.12s ease;
+  touch-action: manipulation;
+  user-select: none;
+  text-decoration: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+a.game-chrome {
+  cursor: pointer;
+}
+
+select.game-chrome {
+  padding-right: var(--chrome-pad-x-end);
+  cursor: pointer;
+}
+
+.game-chrome:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-hover), var(--shadow-inset);
+}
+
+.game-chrome:active {
+  transform: scale(0.96);
+  box-shadow: var(--shadow-toy-soft), var(--shadow-inset);
+}
+
+.game-chrome:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Non-interactive status chip (e.g. truck level) — same box, no hover grow */
+.game-chrome--status {
+  cursor: default;
+  pointer-events: none;
+}
+
+.game-chrome--status:hover,
+.game-chrome--status:active {
+  transform: none;
+  box-shadow: var(--shadow-toy), var(--shadow-inset);
+}
+
+.game-chrome--primary { background: var(--btn-primary); }
+.game-chrome--secondary { background: var(--btn-secondary); }
+.game-chrome--accent { background: var(--btn-accent); }
+.game-chrome--success { background: var(--btn-success); }
+
+/* Status default: warm gold (truck personality can override) */
+.game-chrome--status {
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  color: #000;
+  text-shadow:
+    1px 1px 0 rgba(255, 255, 255, 0.7),
+    2px 2px 0 rgba(0, 0, 0, 0.25);
+  border-color: #000;
+  font-weight: 800;
+}
+
+html[data-theme="dark"] .game-chrome--status {
+  background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+  border-color: #1e3a5f;
+}
+
+/* === UNIFIED BUTTON SYSTEM (actions; chrome geometry) === */
 .game-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-sm) var(--space-lg);
-  font-size: 18px;
-  font-weight: 700;
+  min-height: var(--chrome-min-h);
+  padding: var(--chrome-pad-y) var(--chrome-pad-x);
+  font-size: var(--chrome-font);
+  font-weight: var(--chrome-font-weight);
   font-family: var(--font-family);
   color: var(--text-inverse);
-  border: 3px solid var(--border-medium);
-  border-radius: var(--radius-md);
+  border: var(--chrome-border) solid var(--border-medium);
+  border-radius: var(--chrome-radius);
   cursor: pointer;
   box-shadow: var(--shadow-toy), var(--shadow-inset);
   text-shadow: var(--text-shadow-dark);
@@ -231,9 +329,13 @@ html[data-theme="dark"] {
 
 /* === RESPONSIVE === */
 @media (max-width: 640px) {
-  .game-btn {
-    padding: 10px 16px;
-    font-size: 16px;
+  :root {
+    --chrome-font: 16px;
+    --chrome-pad-y: 10px;
+    --chrome-pad-x: 14px;
+    --chrome-pad-x-end: 32px;
+    --chrome-min-h: 44px;
+    --chrome-gap: 8px;
   }
 
   .unified-splash__icon {
