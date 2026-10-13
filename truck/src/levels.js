@@ -3,8 +3,6 @@
 // ===================================
 
 import {
-    SLOT_SIZE_LARGE,
-    SLOT_SIZE_SMALL,
     TIER_THRESHOLDS,
     TIER_CONFIG
 } from './constants.js';
@@ -69,10 +67,7 @@ export function createSlot(shape, color, size) {
     slot.setAttribute('aria-label', `Drop zone for ${size} ${color} ${shape}`);
     slot.setAttribute('tabindex', '0');
 
-    // Set size based on size parameter
-    const slotSize = size === 'large' ? SLOT_SIZE_LARGE : SLOT_SIZE_SMALL;
-    slot.style.width = `${slotSize}px`;
-    slot.style.height = `${slotSize}px`;
+    // Size comes from CSS (.slot + .size-large/.size-small → --tire-*)
 
     // Add visual outline showing what shape is needed
     const outline = document.createElement('div');

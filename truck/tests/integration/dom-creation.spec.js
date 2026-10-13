@@ -41,34 +41,51 @@ test.describe('DOM Creation Functions', () => {
     expect(hasOutline.hasColorClass).toBe(true);
   });
 
-  test('createSlot large size is 120x120px', async ({ page }) => {
+  test('createSlot large is CSS-sized via size-large', async ({ page }) => {
     const game = new GamePage(page);
     await game.navigate();
 
     const size = await page.evaluate(() => {
       const slot = createSlot('circle', 'red', 'large');
+      document.body.appendChild(slot);
+      const computed = getComputedStyle(slot);
       return {
-        width: slot.style.width,
-        height: slot.style.height
+        hasClass: slot.classList.contains('size-large'),
+        inlineWidth: slot.style.width,
+        inlineHeight: slot.style.height,
+        width: computed.width,
+        height: computed.height
       };
     });
 
+    expect(size.hasClass).toBe(true);
+    expect(size.inlineWidth).toBe('');
+    expect(size.inlineHeight).toBe('');
     expect(size.width).toBe('120px');
     expect(size.height).toBe('120px');
   });
 
-  test('createSlot small size is 80x80px', async ({ page }) => {
+  test('createSlot small is CSS-sized via size-small', async ({ page }) => {
     const game = new GamePage(page);
     await game.navigate();
 
     const size = await page.evaluate(() => {
       const slot = createSlot('circle', 'red', 'small');
+      document.body.appendChild(slot);
+      const computed = getComputedStyle(slot);
       return {
-        width: slot.style.width,
-        height: slot.style.height
+        hasClass: slot.classList.contains('size-small'),
+        inlineWidth: slot.style.width,
+        inlineHeight: slot.style.height,
+        width: computed.width,
+        height: computed.height
       };
     });
 
+    expect(size.hasClass).toBe(true);
+    expect(size.inlineWidth).toBe('');
+    expect(size.inlineHeight).toBe('');
+    // --tire-small = 2/3 of 120px
     expect(size.width).toBe('80px');
     expect(size.height).toBe('80px');
   });

@@ -8,8 +8,6 @@
 // SIZE CONSTANTS
 // ===================================
 
-export const SLOT_SIZE_LARGE = 120;
-export const SLOT_SIZE_SMALL = 80;
 export const BRUSH_RADIUS = 30;
 export const CONFETTI_COUNT = 50;
 export const FIREWORK_COUNT = 30;

@@ -297,18 +297,20 @@ describe('Level Generation', () => {
       expect(outline.dataset.color).toBe('green');
     });
 
-    it('sets correct size for large slots', () => {
+    it('uses size-large class for large slots (CSS-sized, no inline px)', () => {
       const slot = createSlot('star', 'yellow', 'large');
 
-      expect(slot.style.width).toBe('120px');
-      expect(slot.style.height).toBe('120px');
+      expect(slot.classList.contains('size-large')).toBe(true);
+      expect(slot.style.width).toBe('');
+      expect(slot.style.height).toBe('');
     });
 
-    it('sets correct size for small slots', () => {
+    it('uses size-small class for small slots (CSS-sized, no inline px)', () => {
       const slot = createSlot('heart', 'purple', 'small');
 
-      expect(slot.style.width).toBe('80px');
-      expect(slot.style.height).toBe('80px');
+      expect(slot.classList.contains('size-small')).toBe(true);
+      expect(slot.style.width).toBe('');
+      expect(slot.style.height).toBe('');
     });
   });
 
